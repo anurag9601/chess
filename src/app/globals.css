@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+.chessPlayContainer {
+  background-color: #efebe5;
+}
+
+.chessBoardCotainer {
+  background-color: #f9f6ed;
+}
+
+.blackBoardBox {
+  background-color: #888883;
+}
+
+.whiteBoardBox {
+  background-color: #f9f6ed;
+}
