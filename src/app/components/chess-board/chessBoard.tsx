@@ -6,11 +6,7 @@ import { BoardContext } from "@/app/context/Board.context";
 
 const ChessBoard = () => {
 
-  const { board, selectedPiece, turnOf} = useContext(BoardContext);
-
-  useEffect(() => {
-    console.log("selectedPiece", selectedPiece);
-  }, [selectedPiece])
+  const { board } = useContext(BoardContext);
 
   return (
     <div className="chessBoardCotainer h-[405px] w-[405px] px-[2px] py-[2px] border-[.1px] border-gray-400 grid grid-cols-8 grid-row-8">

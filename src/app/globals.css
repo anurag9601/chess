@@ -15,3 +15,8 @@
 .whiteBoardBox {
   background-color: #f9f6ed;
 }
+
+.selectedPiece {
+  border: 2px solid #000;
+  background-color: #ede0d4;
+}
