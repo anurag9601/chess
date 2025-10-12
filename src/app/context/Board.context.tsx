@@ -39,7 +39,9 @@ const BoardContextProvider = ({ children }: { children: React.ReactNode }) => {
     setTurnOf
   };
 
-  return <BoardContext.Provider value={values}></BoardContext.Provider>;
+  return <BoardContext.Provider value={values}>
+    { children }
+  </BoardContext.Provider>;
 };
 
 export default BoardContextProvider;
