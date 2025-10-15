@@ -1,35 +1,35 @@
 export function pawn(row: number, col: number, board: string[][], turnOf: string): number[][] {
     const moves: number[][] = [];
     if (turnOf === "White") {
-        if (row > 0 && board[row - 1][col] === "") {
+        if (row > 0 && board[row - 1][col] === "" && !board[row - 1][col].includes(turnOf.toLowerCase())) {
             moves.push([row - 1, col]);
         }
 
-        if (row == 6 && board[row - 2][col] === "") {
+        if (row == 6 && board[row - 2][col] === "" && !board[row - 2][col].includes(turnOf.toLowerCase())) {
             moves.push([row - 2, col]);
         }
 
-        if (row > 0 && col >= 0 && board[row - 1][col - 1] !== "") {
+        if (row > 0 && col >= 0 && board[row - 1][col - 1] !== "" && !board[row - 1][col - 1].includes(turnOf.toLowerCase())) {
             moves.push([row - 1, col - 1])
         }
 
-        if (row > 0 && col <= 7 && board[row - 1][col + 1] !== "") {
+        if (row > 0 && col <= 7 && board[row - 1][col + 1] !== "" && !board[row - 1][col + 1].includes(turnOf.toLowerCase())) {
             moves.push([row - 1, col + 1])
         }
     } else {
-        if (row < 7 && board[row + 1][col] === "") {
+        if (row < 7 && board[row + 1][col] === "" && !board[row + 1][col].includes(turnOf.toLowerCase())) {
             moves.push([row + 1, col])
         }
 
-        if (row == 1 && board[row + 2][col] === "") {
+        if (row == 1 && board[row + 2][col] === "" && !board[row + 2][col].includes(turnOf.toLowerCase())) {
             moves.push([row + 2, col]);
         }
 
-        if (row < 7 && col >= 0 && board[row + 1][col - 1] !== "") {
+        if (row < 7 && col >= 0 && board[row + 1][col - 1] !== "" && !board[row + 1][col - 1].includes(turnOf.toLowerCase())) {
             moves.push([row + 1, col - 1])
         }
 
-        if (row < 7 && col <= 7 && board[row + 1][col + 1] !== "") {
+        if (row < 7 && col <= 7 && board[row + 1][col + 1] !== "" && !board[row + 1][col + 1].includes(turnOf.toLowerCase())) {
             moves.push([row + 1, col + 1])
         }
     }
@@ -45,7 +45,9 @@ export function rook(row: number, col: number, board: string[][], turnOf: string
 
     while (rowIndex >= 0) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex])
+            if (!board[rowIndex][colIndex].includes(turnOf.toLowerCase())) {
+                moves.push([rowIndex, colIndex])
+            }
             break
         } else {
             moves.push([rowIndex, colIndex])
@@ -58,7 +60,9 @@ export function rook(row: number, col: number, board: string[][], turnOf: string
 
     while (rowIndex <= 7) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break
         } else {
             moves.push([rowIndex, colIndex]);
@@ -71,7 +75,9 @@ export function rook(row: number, col: number, board: string[][], turnOf: string
 
     while (colIndex >= 0) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break
         } else {
             moves.push([rowIndex, colIndex]);
@@ -84,7 +90,9 @@ export function rook(row: number, col: number, board: string[][], turnOf: string
 
     while (colIndex <= 7) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break
         } else {
             moves.push([rowIndex, colIndex]);
@@ -98,41 +106,41 @@ export function rook(row: number, col: number, board: string[][], turnOf: string
 export function knight(row: number, col: number, board: string[][], turnOf: string): number[][] {
     const moves: number[][] = [];
     if (row - 1 >= 0) {
-        if (col - 2 >= 0) {
+        if (col - 2 >= 0 && !board[row - 1][col - 2].includes(turnOf.toLowerCase())) {
             moves.push([row - 1, col - 2]);
         }
 
-        if (col + 2 <= 7) {
+        if (col + 2 <= 7 && !board[row - 1][col + 2].includes(turnOf.toLowerCase())) {
             moves.push([row - 1, col + 2])
         }
     }
 
     if (row - 2 >= 0) {
-        if (col - 1 >= 0) {
+        if (col - 1 >= 0 && !board[row - 2][col - 1].includes(turnOf.toLowerCase())) {
             moves.push([row - 2, col - 1]);
         }
 
-        if (col + 1 <= 7) {
+        if (col + 1 <= 7 && !board[row - 2][col + 1].includes(turnOf.toLowerCase())) {
             moves.push([row - 2, col + 1]);
         }
     }
 
     if (row + 1 <= 7) {
-        if (col - 2 >= 0) {
+        if (col - 2 >= 0 && !board[row + 1][col - 2].includes(turnOf.toLowerCase())) {
             moves.push([row + 1, col - 2]);
         }
 
-        if (col + 2 <= 7) {
+        if (col + 2 <= 7 && !board[row + 1][col + 2].includes(turnOf.toLowerCase())) {
             moves.push([row + 1, col + 2])
         }
     }
 
     if (row + 2 <= 7) {
-        if (col - 1 >= 0) {
+        if (col - 1 >= 0 && !board[row + 2][col - 1].includes(turnOf.toLowerCase())) {
             moves.push([row + 2, col - 1]);
         }
 
-        if (col + 1 <= 7) {
+        if (col + 1 <= 7 && !board[row + 2][col + 1].includes(turnOf.toLowerCase())) {
             moves.push([row + 2, col + 1]);
         }
     };
@@ -148,7 +156,9 @@ export function bishop(row: number, col: number, board: string[][], turnOf: stri
 
     while (rowIndex >= 0 && colIndex >= 0) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -162,7 +172,9 @@ export function bishop(row: number, col: number, board: string[][], turnOf: stri
 
     while (rowIndex >= 0 && colIndex <= 7) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -176,7 +188,9 @@ export function bishop(row: number, col: number, board: string[][], turnOf: stri
 
     while (rowIndex <= 7 && colIndex >= 0) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -190,7 +204,9 @@ export function bishop(row: number, col: number, board: string[][], turnOf: stri
 
     while (rowIndex <= 7 && colIndex <= 7) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -210,7 +226,9 @@ export function queen(row: number, col: number, board: string[][], turnOf: strin
 
     while (rowIndex >= 0 && colIndex >= 0) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -224,7 +242,9 @@ export function queen(row: number, col: number, board: string[][], turnOf: strin
 
     while (rowIndex >= 0 && colIndex <= 7) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -238,7 +258,9 @@ export function queen(row: number, col: number, board: string[][], turnOf: strin
 
     while (rowIndex <= 7 && colIndex >= 0) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -252,7 +274,9 @@ export function queen(row: number, col: number, board: string[][], turnOf: strin
 
     while (rowIndex <= 7 && colIndex <= 7) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -266,7 +290,9 @@ export function queen(row: number, col: number, board: string[][], turnOf: strin
 
     while (rowIndex >= 0) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -279,7 +305,9 @@ export function queen(row: number, col: number, board: string[][], turnOf: strin
 
     while (rowIndex <= 7) {
         if (board[rowIndex][colIndex] !== "") {
-            moves.push([rowIndex, colIndex]);
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
             break;
         } else {
             moves.push([rowIndex, colIndex]);
@@ -294,33 +322,37 @@ export function king(row: number, col: number, board: string[][], turnOf: string
     const moves: number[][] = [];
 
     if (row - 1 >= 0) {
-        moves.push([row - 1, col]);
+        if (!board[row - 1][col].includes(turnOf.toLowerCase())) {
+            moves.push([row - 1, col]);
+        }
 
-        if (col - 1 >= 0) {
+        if (col - 1 >= 0 && !board[row - 1][col - 1].includes(turnOf.toLowerCase())) {
             moves.push([row - 1, col - 1]);
         }
 
-        if (col + 1 <= 7) {
+        if (col + 1 <= 7 && !board[row - 1][col + 1].includes(turnOf.toLowerCase())) {
             moves.push([row - 1, col + 1]);
         }
     }
 
-    if (col - 1 >= 0) {
+    if (col - 1 >= 0 && !board[row][col - 1].includes(turnOf.toLowerCase())) {
         moves.push([row, col - 1]);
     }
 
-    if (col + 1 <= 7) {
+    if (col + 1 <= 7 && !board[row][col + 1].includes(turnOf.toLowerCase())) {
         moves.push([row, col + 1]);
     }
 
     if (row + 1 <= 7) {
-        moves.push([row + 1, col]);
+        if (!board[row + 1][col].includes(turnOf.toLowerCase())) {
+            moves.push([row + 1, col]);
+        }
 
-        if (col - 1 >= 0) {
+        if (col - 1 >= 0 && !board[row + 1][col - 1].includes(turnOf.toLowerCase())) {
             moves.push([row + 1, col - 1]);
         }
 
-        if (col + 1 <= 7) {
+        if (col + 1 <= 7 && !board[row + 1][col + 1].includes(turnOf.toLowerCase())) {
             moves.push([row + 1, col + 1]);
         }
     };

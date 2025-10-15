@@ -10,7 +10,7 @@ import {
   queen,
   rook,
 } from "@/functions/pieceStepFunction";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 
 interface I {
   boxpiece: string;
@@ -35,7 +35,7 @@ const BoardBox = ({ boxpiece, row, col }: I) => {
     ((row + 1) % 2 === 0 && (col + 1) % 2 !== 0);
 
   const setSelectedPieceIndexes = (): void => {
-    if (board[row][col] === "") {
+    if (moves.some(([r , c]) => r === row && c === col)) {
       onMove();
     } else {
       const [type, piece] = boxpiece.split("-");
