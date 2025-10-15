@@ -19,8 +19,16 @@ interface I {
 }
 
 const BoardBox = ({ boxpiece, row, col }: I) => {
-  const { board, setBoard, selectedPiece, setSelectedPiece, turnOf, setTurnOf, moves, setMoves } =
-    useContext(BoardContext);
+  const {
+    board,
+    setBoard,
+    selectedPiece,
+    setSelectedPiece,
+    turnOf,
+    setTurnOf,
+    moves,
+    setMoves,
+  } = useContext(BoardContext);
 
   const isBlackBox =
     ((row + 1) % 2 !== 0 && (col + 1) % 2 === 0) ||
@@ -67,10 +75,15 @@ const BoardBox = ({ boxpiece, row, col }: I) => {
 
     const updatedBoard = [...board];
 
-    updatedBoard[row][col] = updatedBoard[selectedPiece[0]][selectedPiece[1]];
-    updatedBoard[selectedPiece[0]][selectedPiece[1]] = "";
+    if (board[row][col] === "") {
+      updatedBoard[row][col] = updatedBoard[selectedPiece[0]][selectedPiece[1]];
+      updatedBoard[selectedPiece[0]][selectedPiece[1]] = "";
+    } else {
+      updatedBoard[row][col] = board[selectedPiece[0]][selectedPiece[1]];
+      updatedBoard[selectedPiece[0]][selectedPiece[1]] = "";
+    }
     setBoard(updatedBoard);
-    setTurnOf((prev) => prev === "White" ? "Black" : "White");
+    setTurnOf((prev) => (prev === "White" ? "Black" : "White"));
     setMoves([]);
     setSelectedPiece([]);
   }
@@ -87,11 +100,23 @@ const BoardBox = ({ boxpiece, row, col }: I) => {
       onClick={() => setSelectedPieceIndexes()}
     >
       {getpieceImage(boxpiece) ? (
-        <img
-          src={getpieceImage(boxpiece)}
-          alt=""
-          className="h-[40px] w-[40px]"
-        />
+        moves.some(([r, c]) => r === row && c === col) ? (
+          <div
+            className={`flex items-center justify-center border-[2px] border-green-800 h-full w-full bg-green-100`}
+          >
+            <img
+              src={getpieceImage(boxpiece)}
+              alt=""
+              className="h-[40px] w-[40px]"
+            />
+          </div>
+        ) : (
+          <img
+            src={getpieceImage(boxpiece)}
+            alt=""
+            className="h-[40px] w-[40px]"
+          />
+        )
       ) : moves.some(([r, c]) => r === row && c === col) ? (
         <img src="/pieces/step-dot.png" alt="" className="h-[15px] w-[15px]" />
       ) : (

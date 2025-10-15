@@ -29,7 +29,7 @@ export function pawn(row: number, col: number, board: string[][], turnOf: string
             moves.push([row + 1, col - 1])
         }
 
-        if (row < 7 && col >= 7 && board[row + 1][col + 1] !== "") {
+        if (row < 7 && col <= 7 && board[row + 1][col + 1] !== "") {
             moves.push([row + 1, col + 1])
         }
     }
