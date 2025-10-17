@@ -1,9 +1,11 @@
 import ChessBoard from '@/app/components/chess-board/chessBoard'
+import Players from '@/app/components/players/Players'
 import React from 'react'
 
 const page = () => {
   return (
-    <div className="chessPlayContainer min-h-screen min-w-screen">
+    <div className="chessPlayContainer min-h-screen min-w-screen flex items-center justify-between px-[10%] py-[20px]">
+      <Players />
       <ChessBoard />
     </div>
   )
