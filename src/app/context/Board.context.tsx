@@ -9,7 +9,9 @@ interface I {
     selectedPiece: null | number[];
     setSelectedPiece: Dispatch<SetStateAction<null | number[]>>;
     turnOf: "Black" | "White";
-    setTurnOf: Dispatch<SetStateAction<"Black" | "White">>
+    setTurnOf: Dispatch<SetStateAction<"Black" | "White">>;
+    moves: number[][];
+    setMoves: Dispatch<SetStateAction<number[][]>>;
 }
 
 export const BoardContext = createContext<I>({
@@ -18,7 +20,9 @@ export const BoardContext = createContext<I>({
     selectedPiece: null,
     setSelectedPiece: () => {},
     turnOf: "White",
-    setTurnOf: () => {}
+    setTurnOf: () => {},
+    moves: [],
+    setMoves: () => {},
 });
 
 const BoardContextProvider = ({ children }: { children: React.ReactNode }) => {
@@ -30,13 +34,17 @@ const BoardContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [turnOf, setTurnOf] = React.useState<"Black" | "White">("White");
 
+  const [moves, setMoves] = React.useState<number[][]>([]);
+
   const values = {
     board,
     setBoard,
     selectedPiece,
     setSelectedPiece,
     turnOf,
-    setTurnOf
+    setTurnOf,
+    moves,
+    setMoves
   };
 
   return <BoardContext.Provider value={values}>

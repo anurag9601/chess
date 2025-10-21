@@ -1,4 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200..1000&display=swap');
 @import "tailwindcss";
+
+html, body {
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+}
 
 .chessPlayContainer {
   background-color: #efebe5;
@@ -14,4 +20,9 @@
 
 .whiteBoardBox {
   background-color: #f9f6ed;
+}
+
+.selectedPiece {
+  border: 2px solid #000;
+  background-color: #ede0d4;
 }
