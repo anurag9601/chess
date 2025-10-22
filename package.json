@@ -11,6 +11,7 @@
     "https": "next dev --turbopack --experimental-https"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
     "next": "15.5.4",
     "react": "19.1.0",
@@ -19,6 +20,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
     "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/mongodb": "^4.0.7",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20",
