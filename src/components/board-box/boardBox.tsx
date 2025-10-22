@@ -1,6 +1,6 @@
 "use client";
 
-import { BoardContext } from "@/app/context/Board.context";
+import { BoardContext } from "@/context/Board.context";
 import { getpieceImage } from "@/functions/initialBoard";
 import {
   bishop,

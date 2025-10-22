@@ -1,5 +1,5 @@
-import ChessBoard from '@/app/components/chess-board/chessBoard'
-import Players from '@/app/components/players/Players'
+import ChessBoard from '@/components/chess-board/chessBoard'
+import Players from '@/components/players/Players'
 import React from 'react'
 
 const page = () => {
