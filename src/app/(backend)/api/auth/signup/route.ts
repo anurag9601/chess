@@ -12,7 +12,7 @@ interface reqBodyI {
 
 export async function POST(req: NextRequest) {
     try {
-        connectMongoDB();
+        await connectMongoDB();
 
         const body: reqBodyI = await req.json();
 
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (isUserAlreadyExist) {
-            return Response.json({ success: false, error: "User name or Email is already registered." }, { status: 400 });
+            return NextResponse.json({ success: false, error: "User name or Email is already registered." }, { status: 400 });
         };
 
         const newUser = await UserAuthModel.create({
