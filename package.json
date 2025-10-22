@@ -11,17 +11,20 @@
     "https": "next dev --turbopack --experimental-https"
   },
   "dependencies": {
+    "mongoose": "^8.19.2",
+    "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.5.4"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@biomejs/biome": "2.2.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/mongodb": "^4.0.7",
+    "@types/mongoose": "^5.11.97",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
     "tailwindcss": "^4",
-    "@biomejs/biome": "2.2.0"
+    "typescript": "^5"
   }
 }
