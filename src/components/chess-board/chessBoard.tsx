@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect } from "react";
 import BoardBox from "../board-box/boardBox";
-import { BoardContext } from "@/app/context/Board.context";
+import { BoardContext } from "@/context/Board.context";
 
 const ChessBoard = () => {
 
