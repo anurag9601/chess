@@ -34,6 +34,16 @@ export async function POST(req: NextRequest) {
             uniqueUserName: body.uniqueUserName.replace(/\s+/g, ""),
         });
 
+        const requestToSendEmailVerificationMail = await fetch(`${process.env.APPLICATION_URL}/api/email/emailVerification`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userName: `${newUser.fName} ${newUser.lName}`,
+                sendTo: newUser.userEmail,
+                verifyLink: "",
+            })
+        })
+
         const tokenPayload: generateJWTDataType = {
             fName: newUser.fName,
             lName: newUser.lName,

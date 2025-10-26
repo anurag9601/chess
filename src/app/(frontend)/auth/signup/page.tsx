@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, {
-  ChangeEvent,
-  FormEvent,
-  useRef,
-  useState,
-} from "react";
+import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
 import z from "zod";
 
 interface I {
@@ -64,6 +59,8 @@ const page = () => {
 
     if (isLoading) return;
 
+    setIsLoading(true);
+
     const isValidUserData = userSignUpDataValidation.safeParse(userData);
 
     if (!isValidUserData.success) {
@@ -77,23 +74,28 @@ const page = () => {
       });
 
       setFormError(errorMap);
+      setIsLoading(false);
       return;
     }
 
-    if (!formError.userEmail?.success || !formError.uniqueUserName?.success)
+    if (!formError.userEmail?.success || !formError.uniqueUserName?.success) {
+      setIsLoading(false);
       return;
+    }
 
     const request = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isValidUserData.data)
+      body: JSON.stringify(isValidUserData.data),
     });
 
     const response = await request.json();
 
-    if(response.success) {
+    if (response.success) {
       router.push("/");
     }
+
+    setIsLoading(false);
 
     console.log("response", response);
   }
