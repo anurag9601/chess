@@ -8,7 +8,6 @@ interface reqBodyI {
 
 export async function POST(req: NextRequest) {
     try {
-
         await connectMongoDB();
         
         const body: reqBodyI = await req.json();

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, {
   ChangeEvent,
   FormEvent,
-  useEffect,
   useRef,
   useState,
 } from "react";
@@ -23,6 +23,8 @@ interface validationInterface {
 }
 
 const page = () => {
+  const router = useRouter();
+
   const [formError, setFormError] = useState<
     Record<string, validationInterface>
   >({});
@@ -33,6 +35,8 @@ const page = () => {
     userEmail: "",
     uniqueUserName: "",
   });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const debouncingTimeId = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -55,8 +59,10 @@ const page = () => {
     }));
   }
 
-  function userRegistration(e: FormEvent<HTMLFormElement>) {
+  async function userRegistration(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (isLoading) return;
 
     const isValidUserData = userSignUpDataValidation.safeParse(userData);
 
@@ -72,18 +78,36 @@ const page = () => {
 
       setFormError(errorMap);
       return;
-    } else {
-      console.log("Entered form is valid");
     }
+
+    if (!formError.userEmail?.success || !formError.uniqueUserName?.success)
+      return;
+
+    const request = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(isValidUserData.data)
+    });
+
+    const response = await request.json();
+
+    if(response.success) {
+      router.push("/");
+    }
+
+    console.log("response", response);
   }
 
   function onEmailInput(e: ChangeEvent<HTMLInputElement>) {
+    setIsLoading(true);
     const input = e.target.value;
 
     if (debouncingTimeId.current) clearTimeout(debouncingTimeId.current);
 
     debouncingTimeId.current = setTimeout(async () => {
-      const isValidEmail = z.email().safeParse(input);
+      const isValidEmail = z
+        .email("Please enter a valid email address")
+        .safeParse(input);
 
       if (!isValidEmail.success) {
         setFormError((prev) => ({
@@ -93,6 +117,7 @@ const page = () => {
             message: isValidEmail.error.issues[0].message,
           },
         }));
+        setIsLoading(false);
         return;
       }
 
@@ -116,23 +141,89 @@ const page = () => {
             userEmail: { success: true, message: response.message },
           }));
         }
+
+        setIsLoading(false);
       } catch (error) {
         console.error("Error validating email:", error);
         setFormError((prev) => ({
           ...prev,
           userEmail: { success: false, message: "Network error. Try again." },
         }));
+
+        setIsLoading(false);
       }
     }, 500);
   }
 
   function onUserNameInput(e: ChangeEvent<HTMLInputElement>) {
-    
-  }
+    setIsLoading(true);
+    const input = e.target.value;
 
-  useEffect(() => {
-    console.log("formError", formError);
-  }, [formError]);
+    if (debouncingTimeId.current) {
+      clearTimeout(debouncingTimeId.current);
+    }
+
+    debouncingTimeId.current = setTimeout(async () => {
+      const isValidUserName = z
+        .string()
+        .min(3, "Username must be at least 3 characters")
+        .safeParse(input);
+
+      if (!isValidUserName.success) {
+        setFormError((prev) => ({
+          ...prev,
+          uniqueUserName: {
+            success: false,
+            message: isValidUserName.error.issues[0].message,
+          },
+        }));
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const request = await fetch("/api/auth/uniqueUserName", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            uniqueUserName: isValidUserName.data,
+          }),
+        });
+
+        const response = await request.json();
+
+        if (!response.success) {
+          setFormError((prev) => ({
+            ...prev,
+            uniqueUserName: {
+              success: false,
+              message: response.error,
+            },
+          }));
+        } else {
+          setFormError((prev) => ({
+            ...prev,
+            uniqueUserName: {
+              success: true,
+              message: response.message,
+            },
+          }));
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error validating username:", error);
+        setFormError((prev) => ({
+          ...prev,
+          uniqueUserName: {
+            success: false,
+            message: "Network error. Try again.",
+          },
+        }));
+        setIsLoading(false);
+      }
+    }, 500);
+  }
 
   return (
     <div className="min-h-dvh min-w-dvw flex items-center justify-center">
@@ -218,9 +309,10 @@ const page = () => {
               type="text"
               placeholder="eg.johnDoe01"
               className="border-[1px] px-[10px] py-[5px] rounded-lg text-[15px]"
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                onInputValueChange(e, "uniqueUserName")
-              }
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                onInputValueChange(e, "uniqueUserName");
+                onUserNameInput(e);
+              }}
             />
             <p
               className={`mt-[-5px] text-[11px] sm:text-[12px] font-[600] ${
@@ -233,7 +325,13 @@ const page = () => {
             </p>
           </div>
 
-          <button className="w-full py-[8px] sm:py-[10px] bg-black text-[#f9f6ed] font-[700] rounded-lg cursor-pointer hover:bg-neutral-600 duration-300 text-[15px] sm:text-[16px]">
+          <button
+            className={`w-full py-[8px] sm:py-[10px] bg-black text-[#f9f6ed] font-[700] rounded-lg hover:bg-neutral-600 duration-300 text-[15px] sm:text-[16px] ${
+              isLoading
+                ? "opacity-60 cursor-not-allowed"
+                : "opacity-100 cursor-pointer"
+            }`}
+          >
             Register
           </button>
 

@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
         const newUser = await UserAuthModel.create({
             fName: body.fName,
             lName: body.lName,
-            userEmail: body.userEmail,
-            uniqueUserName: body.uniqueUserName,
+            userEmail: body.userEmail.replace(/\s+/g, ""),
+            uniqueUserName: body.uniqueUserName.replace(/\s+/g, ""),
         });
 
         const tokenPayload: generateJWTDataType = {
