@@ -9,7 +9,7 @@ const page = () => {
   return (
     <div className="min-h-dvh min-w-dvw flex items-center justify-center">
       <div className="max-w-[550px] min-h-fit flex flex-col items-center justify-center border-[1px] rounded-xl mx-[5px] sm:mx-[20px] my-[5px] sm:my-[20px] px-[20px] py-[20px] shadow-2xl">
-        <form className="flex flex-col items-center justify-center gap-[20px]">
+        <form className="flex flex-col items-center justify-center gap-[10px] sm:gap-[20px]">
           <div className="flex flex-col gap-[2px] sm:gap-[5px]">
             <label className="text-black font-[700] text-[17px] sm:text-[20px]">
               Welcome Back
@@ -36,7 +36,7 @@ const page = () => {
             Continue
           </button>
 
-          <Link href='/auth/signup' className="mt-[-10px] text-[14px] font-[500] cursor-pointer hover:underline">Don't have an account?</Link>
+          <Link href='/auth/signup' className="text-[14px] font-[500] cursor-pointer hover:underline">Don't have an account?</Link>
         </form>
       </div>
     </div>
