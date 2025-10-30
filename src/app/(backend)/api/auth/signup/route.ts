@@ -1,7 +1,9 @@
 import { generateJWT, generateJWTDataType } from "@/lib/jsonWebtoken";
 import { connectMongoDB } from "@/mongodb/connectDB";
+import EmailVerificationModel from "@/mongodb/models/emailVerification.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
 import { NextRequest, NextResponse } from "next/server";
+import { v4 as uuidv4 } from 'uuid';
 
 interface reqBodyI {
     fName: string;
@@ -34,15 +36,26 @@ export async function POST(req: NextRequest) {
             uniqueUserName: body.uniqueUserName.replace(/\s+/g, ""),
         });
 
+        const uuid = uuidv4();
+
+        const userEmailVerificationMapping = await EmailVerificationModel.create({
+            uuid: uuid as string,
+            userId: newUser._id as string
+        });
+
         const requestToSendEmailVerificationMail = await fetch(`${process.env.APPLICATION_URL}/api/email/emailVerification`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 userName: `${newUser.fName} ${newUser.lName}`,
                 sendTo: newUser.userEmail,
-                verifyLink: "",
+                verifyLink: `${process.env.APPLICATION_URL}/${userEmailVerificationMapping.uuid}`,
             })
-        })
+        });
+
+        const responseOfSendEmailVerificationMail = await requestToSendEmailVerificationMail.json();
+
+        console.log("responseOfSendEmailVerificationMail", responseOfSendEmailVerificationMail);
 
         const tokenPayload: generateJWTDataType = {
             fName: newUser.fName,

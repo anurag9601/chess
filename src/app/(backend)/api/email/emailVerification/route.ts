@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import nodemailer from 'nodemailer';
-import { success } from "zod";
 
 interface reqBodyI {
     userName: string;
@@ -13,9 +12,9 @@ export async function POST(req: NextRequest) {
         const body: reqBodyI = await req.json();
 
         const transporter = nodemailer.createTransport({
-            host: "smtp.example.com",
-            port: 587,
-            secure: false,
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true,
             auth: {
                 user: process.env.USER_EMAIL,
                 pass: process.env.PASSWORD
@@ -70,8 +69,6 @@ export async function POST(req: NextRequest) {
                 </div>
                 `,
             });
-
-            console.log("sendEmailURL", nodemailer.getTestMessageUrl(info));
 
             return Response.json({ success: true, message: "Email confirmation mail send successfully 🎉!" }, { status: 200 });
 
