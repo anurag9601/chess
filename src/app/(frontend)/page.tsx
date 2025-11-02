@@ -7,8 +7,8 @@ export default function Home() {
         <p className="text-[#2b2b2b] text-[12px] sm:text-[13px] font-[600] sm:font-[700]">
           Please verify your email to unlock online play with your friends.
         </p>{" "}
-        <button className="px-[10px] py-[5px] rounded-md bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[11px] sm:text-[13px] shadow-md hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer">
-          Verify
+        <button className="px-[10px] py-[5px] rounded-md bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[11px] sm:text-[13px] shadow-md transition-all">
+          Unverified
         </button>
       </div>
 

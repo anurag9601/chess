@@ -1,8 +1,15 @@
 "use client";
 
+import { UserContext } from "@/context/User.context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { ChangeEvent, FormEvent, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import z from "zod";
 
 interface I {
@@ -20,11 +27,13 @@ interface validationInterface {
 const page = () => {
   const router = useRouter();
 
+  const { setuserData } = useContext(UserContext);
+
   const [formError, setFormError] = useState<
     Record<string, validationInterface>
   >({});
 
-  const [userData, setUserData] = useState<I>({
+  const [userDataBody, setuserDataBody] = useState<I>({
     fName: "",
     lName: "",
     userEmail: "",
@@ -48,7 +57,7 @@ const page = () => {
   ) {
     const input = event.target.value;
 
-    setUserData((prev) => ({
+    setuserDataBody((prev) => ({
       ...prev,
       [field]: input,
     }));
@@ -61,11 +70,12 @@ const page = () => {
 
     setIsLoading(true);
 
-    const isValidUserData = userSignUpDataValidation.safeParse(userData);
+    const isValiduserDataBody =
+      userSignUpDataValidation.safeParse(userDataBody);
 
-    if (!isValidUserData.success) {
+    if (!isValiduserDataBody.success) {
       const errorMap: Record<string, validationInterface> = {};
-      isValidUserData.error.issues.forEach((e) => {
+      isValiduserDataBody.error.issues.forEach((e) => {
         const fieldName = e.path[0] as string;
         errorMap[fieldName] = {
           success: false,
@@ -86,13 +96,14 @@ const page = () => {
     const request = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isValidUserData.data),
+      body: JSON.stringify(isValiduserDataBody.data),
     });
 
     const response = await request.json();
 
     if (response.success) {
       router.push("/");
+      setuserData(response.data);
     }
 
     setIsLoading(false);

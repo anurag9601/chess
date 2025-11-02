@@ -62,11 +62,12 @@ export async function POST(req: NextRequest) {
             lName: newUser.lName,
             userEmail: newUser.userEmail,
             uniqueUserName: newUser.uniqueUserName,
+            isEmailVerified: newUser.isEmailVerified
         };
 
         const token = generateJWT(tokenPayload);
 
-        const response = NextResponse.json({ success: true, message: "🎉 Congratulations! Your registration has been successfully completed." }, { status: 200 });
+        const response = NextResponse.json({ success: true, message: "🎉 Congratulations! Your registration has been successfully completed.", data: tokenPayload }, { status: 200 });
 
         response.cookies.set("auth-token", token, {
             httpOnly: true,
