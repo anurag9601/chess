@@ -1,9 +1,23 @@
-import React from 'react'
+"use client";
+
+import { UserContext } from "@/context/User.context";
+import { usePathname } from "next/navigation";
+import React, { useContext, useEffect, useState } from "react";
 
 const page = () => {
-  return (
-    <div>page</div>
-  )
-}
+  const pathName = usePathname();
+  const { userData } = useContext(UserContext);
 
-export default page
+  const [verified, setVerified] = useState<boolean>(false);
+
+  async function verifyEmail() {
+    
+  }
+
+  useEffect(() => {
+    console.log("pathName", pathName);
+  }, []);
+  return <div>page</div>;
+};
+
+export default page;
