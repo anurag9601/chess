@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const UserAuthSchema = new mongoose.Schema({
     isEmailVerified : {
         type: Boolean,
-        required: true,
         default: false
     },
     fName: {

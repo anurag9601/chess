@@ -5,6 +5,7 @@ export interface generateJWTDataType {
     lName: string;
     userEmail: string,
     uniqueUserName: string,
+    isEmailVerified: boolean,
 }
 
 const secret = process.env.JWT_SECRET || "";

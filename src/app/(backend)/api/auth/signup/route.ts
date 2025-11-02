@@ -1,7 +1,9 @@
 import { generateJWT, generateJWTDataType } from "@/lib/jsonWebtoken";
 import { connectMongoDB } from "@/mongodb/connectDB";
+import EmailVerificationModel from "@/mongodb/models/emailVerification.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
 import { NextRequest, NextResponse } from "next/server";
+import { v4 as uuidv4 } from 'uuid';
 
 interface reqBodyI {
     fName: string;
@@ -30,20 +32,42 @@ export async function POST(req: NextRequest) {
         const newUser = await UserAuthModel.create({
             fName: body.fName,
             lName: body.lName,
-            userEmail: body.userEmail,
-            uniqueUserName: body.uniqueUserName,
+            userEmail: body.userEmail.replace(/\s+/g, ""),
+            uniqueUserName: body.uniqueUserName.replace(/\s+/g, ""),
         });
+
+        const uuid = uuidv4();
+
+        const userEmailVerificationMapping = await EmailVerificationModel.create({
+            uuid: uuid as string,
+            userId: newUser._id as string
+        });
+
+        const requestToSendEmailVerificationMail = await fetch(`${process.env.APPLICATION_URL}/api/email/emailVerification`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userName: `${newUser.fName} ${newUser.lName}`,
+                sendTo: newUser.userEmail,
+                verifyLink: `${process.env.APPLICATION_URL}/${userEmailVerificationMapping.uuid}`,
+            })
+        });
+
+        const responseOfSendEmailVerificationMail = await requestToSendEmailVerificationMail.json();
+
+        console.log("responseOfSendEmailVerificationMail", responseOfSendEmailVerificationMail);
 
         const tokenPayload: generateJWTDataType = {
             fName: newUser.fName,
             lName: newUser.lName,
             userEmail: newUser.userEmail,
             uniqueUserName: newUser.uniqueUserName,
+            isEmailVerified: newUser.isEmailVerified
         };
 
         const token = generateJWT(tokenPayload);
 
-        const response = NextResponse.json({ success: true, message: "🎉 Congratulations! Your registration has been successfully completed." }, { status: 200 });
+        const response = NextResponse.json({ success: true, message: "🎉 Congratulations! Your registration has been successfully completed.", data: tokenPayload }, { status: 200 });
 
         response.cookies.set("auth-token", token, {
             httpOnly: true,
