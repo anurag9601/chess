@@ -1,4 +1,11 @@
+"use client";
+
+import { UserContext } from "@/context/User.context";
+import { useContext } from "react";
+
 export default function Home() {
+  const { userData } = useContext(UserContext);
+
   return (
     <div className="bg-[url('/images/background.jpg')] bg-cover bg-center h-dvh w-dvw flex flex-col items-center justify-center px-[10%] text-[#1a1a1a] relative">
       <div className="absolute inset-0 bg-[rgba(255,255,255,0.5)] backdrop-blur-[2px]"></div>
@@ -28,7 +35,7 @@ export default function Home() {
         <button className="w-[250px] py-[10px] sm:py-[12px] rounded-xl bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[14px] sm:text-[16px] shadow-md hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer">
           Play With Friend
         </button>
-        <button className="w-[250px] py-[10px] sm:py-[12px] rounded-xl border border-[#00000090] text-[#1a1a1a] font-[600] text-[14px] sm:text-[16px] bg-[rgba(255,255,255,0.7)] hover:bg-[rgba(255,255,255,0.9)] shadow-sm transition-all cursor-pointer">
+        <button className={`w-[250px] py-[10px] sm:py-[12px] rounded-xl border border-[#00000090] text-[#1a1a1a] font-[600] text-[14px] sm:text-[16px] bg-[rgba(255,255,255,0.7)] shadow-sm transition-all ${ userData?.isEmailVerified === true ? "hover:bg-[rgba(255,255,255,0.9)] opacity-100 cursor-pointer" : "opacity-50 cursor-not-allowed"}`}>
           Play Online
         </button>
       </div>
