@@ -27,7 +27,7 @@ interface validationInterface {
 const page = () => {
   const router = useRouter();
 
-  const { setuserData } = useContext(UserContext);
+  const { setUserData } = useContext(UserContext);
 
   const [formError, setFormError] = useState<
     Record<string, validationInterface>
@@ -103,7 +103,7 @@ const page = () => {
 
     if (response.success) {
       router.push("/");
-      setuserData(response.data);
+      setUserData(response.data);
     }
 
     setIsLoading(false);

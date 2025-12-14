@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const UserAuthSchema = new mongoose.Schema({
-    isEmailVerified : {
+    isEmailVerified: {
         type: Boolean,
         default: false
     },
@@ -20,6 +20,14 @@ const UserAuthSchema = new mongoose.Schema({
     uniqueUserName: {
         type: String,
         required: true,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
     }
 }, { timestamps: true });
 
