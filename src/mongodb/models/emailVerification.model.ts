@@ -8,8 +8,16 @@ const EmailVerificationSchema = new mongoose.Schema({
     userId: {
         type: String,
         required: true,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
     }
-},{ timestamps: true });
+}, { timestamps: true });
 
 const EmailVerificationModel = mongoose.models.EmailVerification || mongoose.model("EmailVerification", EmailVerificationSchema);
 

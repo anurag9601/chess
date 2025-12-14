@@ -20,7 +20,6 @@ export function GET(req: NextRequest) {
                 res.cookies.set("auth-token", "", {
                     httpOnly: true,
                     expires: new Date(0),
-                    path: "/"
                 });
 
                 return res;

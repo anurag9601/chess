@@ -55,8 +55,6 @@ export async function POST(req: NextRequest) {
 
         const responseOfSendEmailVerificationMail = await requestToSendEmailVerificationMail.json();
 
-        console.log("responseOfSendEmailVerificationMail", responseOfSendEmailVerificationMail);
-
         const tokenPayload: generateJWTDataType = {
             fName: newUser.fName,
             lName: newUser.lName,
@@ -74,7 +72,6 @@ export async function POST(req: NextRequest) {
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
             maxAge: 90 * 24 * 60 * 60,
-            path: "/"
         });
 
         return response;
