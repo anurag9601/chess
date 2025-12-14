@@ -19,6 +19,11 @@ interface I {
   uniqueUserName: string;
 }
 
+interface loadingI {
+  isUniqueCheckLoading: boolean;
+  isApiLoading: boolean;
+}
+
 interface validationInterface {
   success: boolean;
   message: string;
@@ -40,7 +45,10 @@ const page = () => {
     uniqueUserName: "",
   });
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<loadingI>({
+    isUniqueCheckLoading: false,
+    isApiLoading: false,
+  });
 
   const debouncingTimeId = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -66,9 +74,12 @@ const page = () => {
   async function userRegistration(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (isLoading) return;
+    if (loading.isApiLoading || loading.isUniqueCheckLoading) return;
 
-    setIsLoading(true);
+    setLoading({
+      isUniqueCheckLoading: false,
+      isApiLoading: true,
+    });
 
     const isValiduserDataBody =
       userSignUpDataValidation.safeParse(userDataBody);
@@ -84,12 +95,18 @@ const page = () => {
       });
 
       setFormError(errorMap);
-      setIsLoading(false);
+      setLoading({
+        isUniqueCheckLoading: false,
+        isApiLoading: false,
+      });
       return;
     }
 
     if (!formError.userEmail?.success || !formError.uniqueUserName?.success) {
-      setIsLoading(false);
+      setLoading({
+        isUniqueCheckLoading: false,
+        isApiLoading: false,
+      });
       return;
     }
 
@@ -104,15 +121,21 @@ const page = () => {
     if (response.success) {
       router.push("/");
       setUserData(response.data);
+    } else {
+      alert(response.error);
     }
 
-    setIsLoading(false);
-
-    console.log("response", response);
+    setLoading({
+      isUniqueCheckLoading: false,
+      isApiLoading: false,
+    });
   }
 
   function onEmailInput(e: ChangeEvent<HTMLInputElement>) {
-    setIsLoading(true);
+    setLoading({
+      isUniqueCheckLoading: true,
+      isApiLoading: false,
+    });
     const input = e.target.value;
 
     if (debouncingTimeId.current) clearTimeout(debouncingTimeId.current);
@@ -130,7 +153,10 @@ const page = () => {
             message: isValidEmail.error.issues[0].message,
           },
         }));
-        setIsLoading(false);
+        setLoading({
+          isUniqueCheckLoading: false,
+          isApiLoading: false,
+        });
         return;
       }
 
@@ -155,7 +181,10 @@ const page = () => {
           }));
         }
 
-        setIsLoading(false);
+        setLoading({
+          isUniqueCheckLoading: false,
+          isApiLoading: false,
+        });
       } catch (error) {
         console.error("Error validating email:", error);
         setFormError((prev) => ({
@@ -163,13 +192,19 @@ const page = () => {
           userEmail: { success: false, message: "Network error. Try again." },
         }));
 
-        setIsLoading(false);
+        setLoading({
+          isUniqueCheckLoading: false,
+          isApiLoading: false,
+        });
       }
     }, 500);
   }
 
   function onUserNameInput(e: ChangeEvent<HTMLInputElement>) {
-    setIsLoading(true);
+    setLoading({
+      isUniqueCheckLoading: true,
+      isApiLoading: false,
+    });
     const input = e.target.value;
 
     if (debouncingTimeId.current) {
@@ -190,7 +225,10 @@ const page = () => {
             message: isValidUserName.error.issues[0].message,
           },
         }));
-        setIsLoading(false);
+        setLoading({
+          isUniqueCheckLoading: false,
+          isApiLoading: false,
+        });
         return;
       }
 
@@ -223,7 +261,10 @@ const page = () => {
           }));
         }
 
-        setIsLoading(false);
+        setLoading({
+          isUniqueCheckLoading: false,
+          isApiLoading: false,
+        });
       } catch (error) {
         console.error("Error validating username:", error);
         setFormError((prev) => ({
@@ -233,7 +274,10 @@ const page = () => {
             message: "Network error. Try again.",
           },
         }));
-        setIsLoading(false);
+        setLoading({
+          isUniqueCheckLoading: false,
+          isApiLoading: false,
+        });
       }
     }, 500);
   }
@@ -267,6 +311,7 @@ const page = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   onInputValueChange(e, "fName")
                 }
+                readOnly={loading.isApiLoading}
               />
               <p className="mt-[-5px] text-[11px] sm:text-[12px] text-red-600 font-[600]">
                 {formError.fName?.message || ""}
@@ -283,6 +328,7 @@ const page = () => {
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   onInputValueChange(e, "lName")
                 }
+                readOnly={loading.isApiLoading}
               />
               <p className="mt-[-5px] text-[11px] sm:text-[12px] text-red-600 font-[600]">
                 {formError.lName?.message || ""}
@@ -302,6 +348,7 @@ const page = () => {
                 onInputValueChange(e, "userEmail");
                 onEmailInput(e);
               }}
+              readOnly={loading.isApiLoading}
             />
             <p
               className={`mt-[-5px] text-[11px] sm:text-[12px] ${
@@ -326,6 +373,7 @@ const page = () => {
                 onInputValueChange(e, "uniqueUserName");
                 onUserNameInput(e);
               }}
+              readOnly={loading.isApiLoading}
             />
             <p
               className={`mt-[-5px] text-[11px] sm:text-[12px] font-[600] ${
@@ -340,7 +388,7 @@ const page = () => {
 
           <button
             className={`w-full py-[8px] sm:py-[10px] bg-black text-[#f9f6ed] font-[700] rounded-lg hover:bg-neutral-600 duration-300 text-[15px] sm:text-[16px] ${
-              isLoading
+              loading.isApiLoading || loading.isUniqueCheckLoading
                 ? "opacity-60 cursor-not-allowed"
                 : "opacity-100 cursor-pointer"
             }`}
@@ -350,6 +398,11 @@ const page = () => {
 
           <Link
             href="/auth/signin"
+            onClick={(e) => {
+              if (loading.isApiLoading) {
+                e.preventDefault();
+              }
+            }}
             className="text-[14px] font-[500] cursor-pointer hover:underline"
           >
             Already have an account?

@@ -34,11 +34,11 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 {
                     success: true,
-                    error:
+                    message:
                         "This email address has already been used and is no longer eligible for verification."
                 }
                 ,
-                { status: 401 }
+                { status: 200 }
             );
         }
 
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
                 );
             }
 
-            const updatedToken = await EmailVerificationModel.findOneAndUpdate(
+            await EmailVerificationModel.findOneAndUpdate(
                 { _id: isMappingPresent._id },
                 { isActive: false },
                 { isDeleted: true }
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
             });
 
             return response;
-            
+
         } catch (error) {
             console.error("Error verifying email:", error);
             return NextResponse.json(
