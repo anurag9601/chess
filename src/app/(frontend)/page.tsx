@@ -1,6 +1,7 @@
 "use client";
 
 import { UserContext } from "@/context/User.context";
+import Link from "next/link";
 import { useContext } from "react";
 
 export default function Home() {
@@ -34,9 +35,9 @@ export default function Home() {
       </div>
 
       <div className="relative z-10 flex flex-col items-center gap-[18px]">
-        <button className="w-[250px] py-[10px] sm:py-[12px] rounded-xl bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[14px] sm:text-[16px] shadow-md hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer">
+        <Link className="w-[250px] py-[10px] sm:py-[12px] rounded-xl bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[14px] sm:text-[16px] shadow-md hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer text-center" href="/play">
           Play With Friend
-        </button>
+        </Link>
         <button
           className={`w-[250px] py-[10px] sm:py-[12px] rounded-xl border border-[#00000090] text-[#1a1a1a] font-[600] text-[14px] sm:text-[16px] bg-[rgba(255,255,255,0.7)] shadow-sm transition-all ${
             userData?.isEmailVerified === true
