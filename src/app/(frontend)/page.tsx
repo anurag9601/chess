@@ -35,7 +35,11 @@ export default function Home() {
       </div>
 
       <div className="relative z-10 flex flex-col items-center gap-[18px]">
-        <Link className="w-[250px] py-[10px] sm:py-[12px] rounded-xl bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[14px] sm:text-[16px] shadow-md hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer text-center" href="/play">
+        <Link
+          className="w-[250px] py-[10px] sm:py-[12px] rounded-xl bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[14px] sm:text-[16px] shadow-md hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer text-center"
+          href="/play"
+          data-click-sound
+        >
           Play With Friend
         </Link>
         <button
@@ -44,6 +48,7 @@ export default function Home() {
               ? "hover:bg-[rgba(255,255,255,0.9)] opacity-100 cursor-pointer"
               : "opacity-50 cursor-not-allowed"
           }`}
+          data-click-sound
         >
           Play Online
         </button>
