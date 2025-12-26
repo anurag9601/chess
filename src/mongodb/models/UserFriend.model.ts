@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { boolean } from "zod";
 
 const UserFriendSchema = new mongoose.Schema({
     userId: {
