@@ -1,6 +1,7 @@
 "use client";
 
 import { MusicContext } from "@/context/music.context";
+import Link from "next/link";
 import React, { useContext, useEffect, useState } from "react";
 
 interface I {
@@ -93,17 +94,18 @@ const Settings = () => {
       )}
       <div className="flex flex-items items-top justify-top max-h-screen h-[500px]">
         <div className="flex gap-[40px]">
-          <button
+          <Link
             className="h-[50px] w-[50px] border-[1px] border-[#888883] rounded-md flex items-center justify-center cursor-pointer hover:bg-[#f9f6ed] transition-all duration-100"
             onClick={() => toggleWindow("homeOpen")}
             data-click-sound
+            href="/"
           >
             <img
               src="./images/home.png"
               alt="home"
               className="h-[25px] w-[25px]"
             />
-          </button>
+          </Link>
           <button
             className="h-[50px] w-[50px] border-[1px] border-[#888883] rounded-md flex items-center justify-center cursor-pointer hover:bg-[#f9f6ed] transition-all duration-100"
             onClick={() => toggleWindow("settingOpen")}
