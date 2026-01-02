@@ -269,8 +269,8 @@ export function queen(row: number, col: number, board: string[][], turnOf: strin
         }
     }
 
-    rowIndex = row += 1;
-    colIndex = col += 1;
+    rowIndex = row + 1;
+    colIndex = col + 1;
 
     while (rowIndex <= 7 && colIndex <= 7) {
         if (board[rowIndex][colIndex] !== "") {
@@ -312,6 +312,36 @@ export function queen(row: number, col: number, board: string[][], turnOf: strin
         } else {
             moves.push([rowIndex, colIndex]);
             rowIndex += 1;
+        }
+    };
+
+    rowIndex = row;
+    colIndex = col + 1;
+
+    while (colIndex <= 7) {
+        if (board[rowIndex][colIndex] !== "") {
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
+            break;
+        } else {
+            moves.push([rowIndex, colIndex]);
+            colIndex += 1;
+        }
+    };
+
+    rowIndex = row;
+    colIndex = col - 1;
+
+    while (colIndex >= 0) {
+        if (board[rowIndex][colIndex] !== "") {
+            if (!board[rowIndex][colIndex].includes(turnOf.toLocaleLowerCase())) {
+                moves.push([rowIndex, colIndex]);
+            }
+            break;
+        } else {
+            moves.push([rowIndex, colIndex]);
+            colIndex -= 1;
         }
     };
 
