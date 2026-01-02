@@ -24,7 +24,12 @@ export default function Home() {
 
       <div className="relative z-10 text-center flex flex-col items-center gap-[25px] mb-[40px] sm:mb-[70px] md:mb-[80px]">
         <h1 className="text-[30px] sm:text-[38px] font-[800] bg-gradient-to-r from-[#0f172a] via-[#334155] to-[#64748b] bg-clip-text text-transparent tracking-tight">
-          Welcome <span className="font-[900]">Anurag Mishra</span>
+          Welcome{" "}
+          {userData && (
+            <span className="font-[900]">
+              {userData.fName + " " + userData.lName}
+            </span>
+          )}
         </h1>
 
         <p className="text-[12px] xs:text-[13px] sm:text-[14px] md:text-[17px] text-[#2b2b2b] max-w-[850px] leading-relaxed font-[500] text-justify sm:text-center">
