@@ -1,6 +1,6 @@
 import { generateJWT, generateJWTDataType } from "@/lib/jsonWebtoken";
 import { connectMongoDB } from "@/mongodb/connectDB";
-import EmailVerificationModel from "@/mongodb/models/emailVerification.model";
+import EmailVerificationModel from "@/mongodb/models/EmailVerification.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
 import { NextRequest, NextResponse } from "next/server";
 import { success } from "zod";
