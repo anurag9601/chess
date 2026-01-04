@@ -1,5 +1,5 @@
 import { connectMongoDB } from "@/mongodb/connectDB";
-import UserFriendModel from "@/mongodb/models/UserFriend.model";
+import FriendRequestModel from "@/mongodb/models/FriendRequest.model";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -19,20 +19,17 @@ export async function POST(req: NextRequest) {
 
         const currentUserId = new mongoose.Types.ObjectId(body.userId);
 
-        const userFriendData = await UserFriendModel.findOne({
-            userId: currentUserId,
+        const userActiveRequests = await FriendRequestModel.find({
+            receivedBy: currentUserId,
+            status: "pending",
             isActive: true,
             isDeleted: false,
         });
 
-        if (!userFriendData) {
-            return NextResponse.json({ success: false, error: "User not found " }, { status: 400 });
-        };
-
-        return NextResponse.json({ success: true, users: userFriendData.friends });
+        return NextResponse.json({ success: true, request: userActiveRequests }, { status: 200 });
 
     } catch (error) {
-        console.log("Something went wrong in /api/online/friends/ route", error);
+        console.log("Something went wrong in /api/online/requests/ route", error);
         return NextResponse.json({ success: false, error: "Something went wrong" }, { status: 500 });
     }
 }

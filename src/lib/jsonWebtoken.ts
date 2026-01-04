@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export interface generateJWTDataType {
+    _id: string;
     fName: string;
     lName: string;
     userEmail: string,

@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
         const responseOfSendEmailVerificationMail = await requestToSendEmailVerificationMail.json();
 
         const tokenPayload: generateJWTDataType = {
+            _id: newUser._id,
             fName: newUser.fName,
             lName: newUser.lName,
             userEmail: newUser.userEmail,
