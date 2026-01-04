@@ -1,7 +1,12 @@
 "use client";
-import React, { useRef, useState } from "react";
+import { UserContext } from "@/context/User.context";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import Friends from "./friends/friends";
+import Explore from "./explore/explore";
+import Request from "./request/request";
 
 const FriendsListing = () => {
+  const { userData } = useContext(UserContext);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [openTab, setOpenTab] = useState<"friends" | "explore" | "request">(
@@ -10,11 +15,28 @@ const FriendsListing = () => {
 
   const [connectionInfo, setConnectionInfo] = useState();
 
-  const [challengeQueue, setChallengeQueue] = useState<number[]>([]);
-
   function onTabSelect(tabName: "friends" | "explore" | "request") {
     setOpenTab(tabName);
   }
+
+  // async function explore(userName: string) {
+  //   const request = await fetch("/api/online/explore", {
+  //     method: "POST",
+  //     body: JSON.stringify({
+  //       userName: userName,
+  //     }),
+  //   });
+
+  //   const response = await request.json();
+
+  //   console.log("explore users", response);
+  // }
+
+  // useEffect(() => {
+  //   if (userData) {
+  //     explore(userData.uniqueUserName);
+  //   }
+  // }, [userData]);
 
   return (
     <div className="flex flex-col items-center gap-[10px] max-w-[400px] w-full border-r-[1px] border-[#99a1af] max-h-screen h-[500px] pr-[20px]">
@@ -66,67 +88,11 @@ const FriendsListing = () => {
         </div>
       </div>
 
-      {openTab === "friends" && (
-        // <div className="flex-1 flex flex-col items-start justify-start gap-[10px] h-full w-full overflow-y-auto custom-scrollbar">
-        //   <div className="flex items-start justify-between gap-[10px] w-full bg-[#f9f6ed] p-[10px] rounded-md hover: ">
-        //     <div className="flex items-center justify-center gap-[10px]">
-        //       <img
-        //         src="./images/user-pawn.png"
-        //         alt="user-pawn"
-        //         className="h-[20px] w-[20px]"
-        //       />
-        //       <p className="text-[14px] font-[700] break-all">Anurag 01</p>
-        //     </div>
-        //     <button className="bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[13px] px-[10px] py-[5px] rounded-lg cursor-pointer">
-        //       Challenge
-        //     </button>
-        //   </div>
-        // </div>
+      {openTab === "friends" && <Friends />}
 
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-[13px] text-[#888883] font-[700] text-center">
-            You don’t have any friends connected yet. Go to the Explore tab to
-            discover real users and send them a friend request to start playing
-            online.
-          </p>
-        </div>
-      )}
+      {openTab === "explore" && <Explore />}
 
-      {openTab === "explore" && (
-        // <div className="flex-1 flex flex-col items-start justify-start gap-[10px] h-full w-full overflow-y-auto custom-scrollbar">
-        //   <div className="flex items-start justify-between gap-[10px] w-full bg-[#f9f6ed] p-[10px] rounded-md hover: ">
-        //     <div className="flex items-center justify-center gap-[10px]">
-        //       <img
-        //         src="./images/friend-request.png"
-        //         alt="user-pawn"
-        //         className="h-[20px] w-[20px]"
-        //       />
-        //       <p className="text-[14px] font-[700] break-all">Anurag 01</p>
-        //     </div>
-        //     <button className="bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[13px] px-[10px] py-[5px] rounded-lg cursor-pointer">
-        //       Send Request
-        //     </button>
-        //   </div>
-        // </div>
-
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-[13px] text-[#888883] font-[700] text-center">
-            Sorry for the inconvenience. Currently, there are no available users
-            for you to send a friend request to. You may have already sent
-            requests to all existing users, or there are no other users yet.
-          </p>
-        </div>
-      )}
-
-      {openTab === "request" && (
-        <div className="flex-1 flex items-center justify-center">
-          <p className="text-[13px] text-[#888883] font-[700] text-center">
-            You currently don’t have any friend requests. If there are any
-            updates, you’ll receive a notification, and new requests will appear
-            here for you to accept.
-          </p>
-        </div>
-      )}
+      {openTab === "request" && <Request />}
     </div>
   );
 };

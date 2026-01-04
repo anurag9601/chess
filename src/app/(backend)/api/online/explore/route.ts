@@ -5,21 +5,23 @@ import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 interface reqBodyI {
-    userId: string;
+    userName: string;
 }
 
 export async function POST(req: NextRequest) {
     try {
         const body: reqBodyI = await req.json();
 
-        if (!mongoose.Types.ObjectId.isValid(body.userId)) {
+        const userInfo = await UserAuthModel.findOne({ uniqueUserName: body.userName });
+
+        if (!userInfo) {
             return NextResponse.json(
-                { success: false, message: "Invalid user id" },
+                { success: false, message: "User not found" },
                 { status: 400 }
             );
         };
 
-        const currentUserId = new mongoose.Types.ObjectId(body.userId);
+        const currentUserId = userInfo._id;
 
         let friendsIds: mongoose.Types.ObjectId[] = [];
 
@@ -60,7 +62,7 @@ export async function POST(req: NextRequest) {
         }).select("uniqueUserName fName lName").limit(30).lean();
 
         return NextResponse.json({ success: true, users }, { status: 200 });
-        
+
     } catch (error) {
         console.log("Something went wrong in /api/online/explore/ route", error);
         return NextResponse.json({ success: false, error: "Something went wrong" }, { status: 500 });
