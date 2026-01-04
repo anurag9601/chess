@@ -42,9 +42,9 @@ export async function POST(req: NextRequest) {
         });
 
         if (currentUserActiveSession) {
-            const expired = currentUserActiveSession.expiredOn < new Date();
+            const validSession = currentUserActiveSession.expiredOn < new Date();
 
-            if (!expired) {
+            if (!validSession) {
                 currentUserActiveSession.isActive = false;
                 currentUserActiveSession.isDeleted = true;
                 currentUserActiveSession.save();
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
 
         return Response.json({ success: true, message: `Verification OTP has been successfully sent to ${user.userEmail}` }, { status: 200 });
     } catch (error) {
-        console.log("Something went wrong in /api/auth/signin/ route", error);
+        console.log("Something went wrong in /api/auth/generate-otp/ route", error);
         return Response.json({ success: false, error: "Something went wrong" }, { status: 500 });
     }
 }
