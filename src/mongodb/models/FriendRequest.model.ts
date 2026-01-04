@@ -20,6 +20,10 @@ const FriendRequestSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    isReported: {
+        type: Boolean,
+        default: false,
+    },
     isActive: {
         type: Boolean,
         default: true,

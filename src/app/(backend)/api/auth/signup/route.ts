@@ -2,6 +2,7 @@ import { generateJWT, generateJWTDataType } from "@/lib/jsonWebtoken";
 import { connectMongoDB } from "@/mongodb/connectDB";
 import EmailVerificationModel from "@/mongodb/models/EmailVerification.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
+import UserFriendModel from "@/mongodb/models/UserFriend.model";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,6 +36,12 @@ export async function POST(req: NextRequest) {
             userEmail: body.userEmail.replace(/\s+/g, ""),
             uniqueUserName: body.uniqueUserName.replace(/\s+/g, ""),
         });
+
+        if (newUser) {
+            await UserFriendModel.create({
+                userId: newUser._id
+            });
+        }
 
         const uuid = uuidv4();
 
