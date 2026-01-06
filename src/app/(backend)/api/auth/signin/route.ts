@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     try {
         await connectMongoDB();
 
-        const body = await req.json();
+        const body: reqBodyI = await req.json();
 
         const availableSignInSession = await SignInVerificationSessionModel.findOne({
             email: body.email,
@@ -36,19 +36,17 @@ export async function POST(req: NextRequest) {
             availableSignInSession.save();
 
             return NextResponse.json({ success: false, error: "Your OTP has expired. Please generate a new OTP to continue." }, { status: 400 });
-        };
-
-        if (availableSignInSession.otp !== body.otp) {
+        }else if (availableSignInSession.otp !== body.otp) {
             return NextResponse.json({ success: false, error: "The OTP you entered is incorrect. Please enter the valid OTP sent to your email." }, { status: 400 });
         };
 
-        const newUser = await UserAuthModel.findOne({
+        const currentUser = await UserAuthModel.findOne({
             _id: availableSignInSession.userId
         });
 
-        if (newUser) {
+        if (currentUser) {
             await UserFriendModel.create({
-                userId: newUser._id
+                userId: currentUser._id
             });
         }
 
@@ -56,15 +54,15 @@ export async function POST(req: NextRequest) {
 
         const userEmailVerificationMapping = await EmailVerificationModel.create({
             uuid: uuid as string,
-            userId: newUser._id as string
+            userId: currentUser._id as string
         });
 
         const requestToSendEmailVerificationMail = await fetch(`${process.env.APPLICATION_URL}/api/email/emailVerification`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                userName: `${newUser.fName} ${newUser.lName}`,
-                sendTo: newUser.userEmail,
+                userName: `${currentUser.fName} ${currentUser.lName}`,
+                sendTo: currentUser.userEmail,
                 verifyLink: `${process.env.APPLICATION_URL}/${userEmailVerificationMapping.uuid}`,
             })
         });
@@ -72,12 +70,12 @@ export async function POST(req: NextRequest) {
         const responseOfSendEmailVerificationMail = await requestToSendEmailVerificationMail.json();
 
         const tokenPayload: generateJWTDataType = {
-            _id: newUser._id,
-            fName: newUser.fName,
-            lName: newUser.lName,
-            userEmail: newUser.userEmail,
-            uniqueUserName: newUser.uniqueUserName,
-            isEmailVerified: newUser.isEmailVerified
+            _id: currentUser._id,
+            fName: currentUser.fName,
+            lName: currentUser.lName,
+            userEmail: currentUser.userEmail,
+            uniqueUserName: currentUser.uniqueUserName,
+            isEmailVerified: currentUser.isEmailVerified
         };
 
         const token = generateJWT(tokenPayload);

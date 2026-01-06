@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
         await connectMongoDB();
 
-        const body = await req.json();
+        const body: reqBodyI = await req.json();
 
         const user = await UserAuthModel.findOne({
             userEmail: body.email,
@@ -75,6 +75,20 @@ export async function POST(req: NextRequest) {
         });
 
         console.log("newSignInVerificationData", newSignInVerificationData);
+
+        const requestToSendOTPEmail = await fetch("/${process.env.APPLICATION_URL}/api/email/sendOTP", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                sendTo: body.email,
+                otp: newOtp,
+                fName: user.fName,
+                lName: user.lName,
+                uniqueUserName: user.uniqueUserName,
+            })
+        });
+
+        const responseOfSendOTPEmail = await requestToSendOTPEmail.json();
 
         return Response.json({ success: true, message: `Verification OTP has been successfully sent to ${user.userEmail}` }, { status: 200 });
     } catch (error) {
