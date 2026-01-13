@@ -13,11 +13,11 @@ const Friends = () => {
   const [friends, setFriends] = useState<friendsDataI[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  async function getCurrentUserAllFriends(userName: string) {
+  async function getCurrentUserAllFriends(userId: string) {
     const request = await fetch("/api/online/friends", {
       method: "POST",
       body: JSON.stringify({
-        userName: userName,
+        userId: userId,
       }),
     });
 
@@ -33,7 +33,7 @@ const Friends = () => {
 
   useEffect(() => {
     if (userData) {
-      getCurrentUserAllFriends(userData.uniqueUserName);
+      getCurrentUserAllFriends(userData._id);
     }
   }, [userData]);
   return (
