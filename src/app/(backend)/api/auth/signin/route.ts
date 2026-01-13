@@ -28,16 +28,20 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: "You don’t have any active OTP session. Please generate a new OTP to continue." }, { status: 400 });
         }
 
-        const validSession = availableSignInSession.expiredOn < new Date();
+        const isExpired = availableSignInSession.expiredOn < new Date();
 
-        if (!validSession) {
+        if (isExpired) {
             availableSignInSession.isActive = false;
             availableSignInSession.isDeleted = true;
             availableSignInSession.save();
 
             return NextResponse.json({ success: false, error: "Your OTP has expired. Please generate a new OTP to continue." }, { status: 400 });
-        }else if (availableSignInSession.otp !== body.otp) {
+        } else if (availableSignInSession.otp !== body.otp) {
             return NextResponse.json({ success: false, error: "The OTP you entered is incorrect. Please enter the valid OTP sent to your email." }, { status: 400 });
+        } else if (availableSignInSession.otp === body.otp) {
+            availableSignInSession.isActive = false;
+            availableSignInSession.isDeleted = true;
+            availableSignInSession.save();
         };
 
         const currentUser = await UserAuthModel.findOne({

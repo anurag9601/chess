@@ -1,12 +1,10 @@
 "use client";
 
-import { UserContext } from "@/context/User.context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, {
   ChangeEvent,
   FormEvent,
-  useContext,
   useRef,
   useState,
 } from "react";
@@ -31,8 +29,6 @@ interface validationInterface {
 
 const page = () => {
   const router = useRouter();
-
-  const { setUserData } = useContext(UserContext);
 
   const [formError, setFormError] = useState<
     Record<string, validationInterface>
@@ -119,8 +115,7 @@ const page = () => {
     const response = await request.json();
 
     if (response.success) {
-      router.push("/");
-      setUserData(response.data);
+      router.push("/auth/signin");
     } else {
       alert(response.error);
     }
