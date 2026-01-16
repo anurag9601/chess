@@ -63,6 +63,7 @@ export async function POST(req: NextRequest) {
             );
 
             const tokenPayload: generateJWTDataType = {
+                _id: updatedUser._id,
                 fName: updatedUser.fName,
                 lName: updatedUser.lName,
                 userEmail: updatedUser.userEmail,
