@@ -192,7 +192,7 @@ const page = () => {
           isApiLoading: false,
         });
       }
-    }, 500);
+    }, 1000);
   }
 
   function onUserNameInput(e: ChangeEvent<HTMLInputElement>) {

@@ -11,6 +11,7 @@ import react, {
 
 interface editUserNameI {
   isUnquieUserNameEditable: boolean;
+  isLoading: boolean;
   success: boolean;
   message: string;
 }
@@ -25,10 +26,13 @@ const Header = () => {
     isWindowOpen: false,
     editUserNameData: {
       isUnquieUserNameEditable: false,
+      isLoading: false,
       success: false,
       message: "",
     },
   });
+
+  const debouncingTimeId = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function handleToggleUserWindow() {
     setUserInfoWindowControler((prev) => ({
@@ -46,21 +50,98 @@ const Header = () => {
           !prev.editUserNameData.isUnquieUserNameEditable,
       },
     }));
-  };
+  }
 
-  function onChangeOfUniqueUserName(e: ChangeEvent<HTMLInputElement>) {
+  async function onChangeOfUniqueUserName(e: ChangeEvent<HTMLInputElement>) {
     const input = e.target.value;
 
-    if(input.length < 3) {
+    if (input.length === 0) {
+      setUserInfoWindowControler((prev) => ({
+        ...prev,
+        editUserNameData: {
+          ...prev.editUserNameData,
+          isLoading: false,
+          success: false,
+          message: "",
+        },
+      }));
+
+      if (debouncingTimeId.current) clearTimeout(debouncingTimeId.current);
+      return;
+    }
+
+    if (input.length < 3) {
       setUserInfoWindowControler((prev) => ({
         ...prev,
         editUserNameData: {
           ...prev.editUserNameData,
           success: false,
-          message: "A unique username must be at least 3 characters long."
-        }
-      }))
+          message: "A unique username must be at least 3 characters long.",
+        },
+      }));
+
+      if (debouncingTimeId.current) clearTimeout(debouncingTimeId.current);
+      return;
     }
+
+    if (debouncingTimeId.current) {
+      clearTimeout(debouncingTimeId.current);
+    }
+
+    setUserInfoWindowControler((prev) => ({
+      ...prev,
+      editUserNameData: {
+        ...prev.editUserNameData,
+        isLoading: true,
+      },
+    }));
+
+    debouncingTimeId.current = setTimeout(async () => {
+      try {
+        const request = await fetch("/api/auth/uniqueUserName", {
+          method: "POST",
+          body: JSON.stringify({
+            uniqueUserName: input,
+          }),
+        });
+
+        const response = await request.json();
+
+        if (!response.success) {
+          setUserInfoWindowControler((prev) => ({
+            ...prev,
+            editUserNameData: {
+              ...prev.editUserNameData,
+              isLoading: false,
+              success: false,
+              message: response.error,
+            },
+          }));
+        } else if (response.success) {
+          setUserInfoWindowControler((prev) => ({
+            ...prev,
+            editUserNameData: {
+              ...prev.editUserNameData,
+              isLoading: false,
+              success: true,
+              message:
+                "Great! This username is available. Press Enter to proceed.",
+            },
+          }));
+        }
+      } catch (error) {
+        console.error("Error validating email:", error);
+        setUserInfoWindowControler((prev) => ({
+          ...prev,
+          editUserNameData: {
+            ...prev.editUserNameData,
+            isLoading: false,
+            success: false,
+            message: "Network error. Try again.",
+          },
+        }));
+      }
+    }, 1000);
   }
 
   useEffect(() => {
@@ -73,6 +154,7 @@ const Header = () => {
           isWindowOpen: false,
           editUserNameData: {
             isUnquieUserNameEditable: false,
+            isLoading: false,
             success: false,
             message: "",
           },
@@ -114,7 +196,7 @@ const Header = () => {
         {userInfoWindowControler.isWindowOpen && (
           <div
             className="absolute top-[45px] right-[3px] border-[1px] border-[#99a1af] shadow-lg rounded-lg h-fit w-[180px] p-[10px]"
-            onClick={(e: ChangeEvent<HTMLDivElement>) => {
+            onClick={(e: MouseEvent<HTMLDivElement>) => {
               e.stopPropagation();
             }}
           >
@@ -128,19 +210,22 @@ const Header = () => {
                   type="text"
                   placeholder={`e.g. ${userData.uniqueUserName}`}
                   className="border-[1px] px-[10px] py-[5px] rounded-lg text-[13px]"
-                  onClick={(e: ChangeEvent<HTMLInputElement>) => {
+                  onClick={(e: MouseEvent<HTMLInputElement>) => {
                     e.stopPropagation();
                   }}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    onChangeOfUniqueUserName(e)
+                  }
                 />
-                {/* <p
-              className={`mt-[-5px] text-[11px] sm:text-[12px] ${
-                signInData.email.success === true
-                  ? "text-lime-700"
-                  : "text-red-600"
-              } font-[600]`}
-            >
-              {signInData.email.message || ""}
-            </p> */}
+                <p
+                  className={`mt-[5px] text-[10px] ${
+                    userInfoWindowControler.editUserNameData.success === true
+                      ? "text-lime-700"
+                      : "text-red-600"
+                  } font-[500]`}
+                >
+                  {userInfoWindowControler.editUserNameData.message || ""}
+                </p>
               </div>
             ) : (
               <div className="flex itmes-center justify-between gap-[10px]">
