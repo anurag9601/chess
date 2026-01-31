@@ -2,6 +2,8 @@
 import { UserContext } from "@/context/User.context";
 import react, {
   ChangeEvent,
+  FormEvent,
+  FormEventHandler,
   MouseEvent,
   useContext,
   useEffect,
@@ -11,13 +13,14 @@ import react, {
 
 interface editUserNameI {
   isUnquieUserNameEditable: boolean;
+  data: string;
   isLoading: boolean;
   success: boolean;
   message: string;
 }
 
 const Header = () => {
-  const { userData } = useContext(UserContext);
+  const { userData, setUserData } = useContext(UserContext);
   const userInfoContainerRef = useRef<HTMLDivElement | null>(null);
   const [userInfoWindowControler, setUserInfoWindowControler] = useState<{
     isWindowOpen: boolean;
@@ -26,6 +29,7 @@ const Header = () => {
     isWindowOpen: false,
     editUserNameData: {
       isUnquieUserNameEditable: false,
+      data: "",
       isLoading: false,
       success: false,
       message: "",
@@ -60,6 +64,7 @@ const Header = () => {
         ...prev,
         editUserNameData: {
           ...prev.editUserNameData,
+          data: input,
           isLoading: false,
           success: false,
           message: "",
@@ -75,6 +80,7 @@ const Header = () => {
         ...prev,
         editUserNameData: {
           ...prev.editUserNameData,
+          data: input,
           success: false,
           message: "A unique username must be at least 3 characters long.",
         },
@@ -92,6 +98,7 @@ const Header = () => {
       ...prev,
       editUserNameData: {
         ...prev.editUserNameData,
+        data: input,
         isLoading: true,
       },
     }));
@@ -112,6 +119,7 @@ const Header = () => {
             ...prev,
             editUserNameData: {
               ...prev.editUserNameData,
+              data: input,
               isLoading: false,
               success: false,
               message: response.error,
@@ -122,6 +130,7 @@ const Header = () => {
             ...prev,
             editUserNameData: {
               ...prev.editUserNameData,
+              data: input,
               isLoading: false,
               success: true,
               message:
@@ -135,6 +144,7 @@ const Header = () => {
           ...prev,
           editUserNameData: {
             ...prev.editUserNameData,
+            data: input,
             isLoading: false,
             success: false,
             message: "Network error. Try again.",
@@ -142,6 +152,59 @@ const Header = () => {
         }));
       }
     }, 1000);
+  }
+
+  async function handleOnUserNameSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (userInfoWindowControler.editUserNameData.success === false) return;
+
+    const request = await fetch("/api/user/update", {
+      method: "POST",
+      headers: { "Content-Type": "applicaiton/json" },
+      body: JSON.stringify({
+        userId: userData?._id,
+        newUniqueUserName: userInfoWindowControler.editUserNameData.data,
+      }),
+    });
+
+    const response = await request.json();
+
+    console.log("response", response);
+
+    if (response.success === true) {
+      setUserData((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          uniqueUserName: userInfoWindowControler.editUserNameData.data,
+        };
+      });
+
+      setUserInfoWindowControler((prev) => ({
+        ...prev,
+        editUserNameData: {
+          isUnquieUserNameEditable: false,
+          data: "",
+          isLoading: false,
+          success: false,
+          message: "",
+        },
+      }));
+    }
+  }
+
+  async function handleOnSignOut() {
+    const request = await fetch("/api/auth/signout");
+
+    const response = await request.json();
+
+    if (response.success === true) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
   }
 
   useEffect(() => {
@@ -154,6 +217,7 @@ const Header = () => {
           isWindowOpen: false,
           editUserNameData: {
             isUnquieUserNameEditable: false,
+            data: "",
             isLoading: false,
             success: false,
             message: "",
@@ -200,53 +264,58 @@ const Header = () => {
               e.stopPropagation();
             }}
           >
-            {userInfoWindowControler.editUserNameData
-              .isUnquieUserNameEditable ? (
-              <div className="flex flex-col gap-[3px] w-full">
-                <label className="text-black font-[600] text-[12px]">
-                  New Unique Username
-                </label>
-                <input
-                  type="text"
-                  placeholder={`e.g. ${userData.uniqueUserName}`}
-                  className="border-[1px] px-[10px] py-[5px] rounded-lg text-[13px]"
-                  onClick={(e: MouseEvent<HTMLInputElement>) => {
-                    e.stopPropagation();
-                  }}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    onChangeOfUniqueUserName(e)
-                  }
-                />
-                <p
-                  className={`mt-[5px] text-[10px] ${
-                    userInfoWindowControler.editUserNameData.success === true
-                      ? "text-lime-700"
-                      : "text-red-600"
-                  } font-[500]`}
-                >
-                  {userInfoWindowControler.editUserNameData.message || ""}
-                </p>
-              </div>
-            ) : (
-              <div className="flex itmes-center justify-between gap-[10px]">
-                <p className="break-all text-[13px] font-[600]">
-                  {userData.uniqueUserName}
-                </p>
-                <img
-                  src="images/edit.png"
-                  alt="edit"
-                  className="h-[20px] w-[20px]"
-                  onClick={(e: MouseEvent<HTMLImageElement>) => {
-                    e.stopPropagation();
-                    handleToggleEditUserName();
-                  }}
-                />
-              </div>
-            )}
+            <form onSubmit={handleOnUserNameSubmit}>
+              {userInfoWindowControler.editUserNameData
+                .isUnquieUserNameEditable ? (
+                <div className="flex flex-col gap-[3px] w-full">
+                  <label className="text-black font-[600] text-[12px]">
+                    New Unique Username
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={`e.g. ${userData.uniqueUserName}`}
+                    className="border-[1px] px-[10px] py-[5px] rounded-lg text-[13px]"
+                    onClick={(e: MouseEvent<HTMLInputElement>) => {
+                      e.stopPropagation();
+                    }}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      onChangeOfUniqueUserName(e)
+                    }
+                  />
+                  <p
+                    className={`mt-[5px] text-[10px] ${
+                      userInfoWindowControler.editUserNameData.success === true
+                        ? "text-lime-700"
+                        : "text-red-600"
+                    } font-[500]`}
+                  >
+                    {userInfoWindowControler.editUserNameData.message || ""}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex itmes-center justify-between gap-[10px]">
+                  <p className="break-all text-[13px] font-[600]">
+                    {userData.uniqueUserName}
+                  </p>
+                  <img
+                    src="images/edit.png"
+                    alt="edit"
+                    className="h-[20px] w-[20px]"
+                    onClick={(e: MouseEvent<HTMLImageElement>) => {
+                      e.stopPropagation();
+                      handleToggleEditUserName();
+                    }}
+                  />
+                </div>
+              )}
+            </form>
 
             <hr className="h-[1px] border-none outline-none bg-[#99a1af] rounded-lg my-[8px]" />
 
-            <button className="w-full py-[5px] bg-black text-[#f9f6ed] font-[600] rounded-lg hover:bg-neutral-600 duration-300 text-[13px] cursor-pointer">
+            <button
+              className="w-full py-[5px] bg-black text-[#f9f6ed] font-[600] rounded-lg hover:bg-neutral-600 duration-300 text-[13px] cursor-pointer"
+              onClick={handleOnSignOut}
+            >
               Sign Out
             </button>
           </div>
