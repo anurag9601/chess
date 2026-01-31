@@ -16,10 +16,12 @@ const UserAuthSchema = new mongoose.Schema({
     userEmail: {
         type: String,
         required: true,
+        unique: true,
     },
     uniqueUserName: {
         type: String,
         required: true,
+        unique: true,
     },
     isActive: {
         type: Boolean,
