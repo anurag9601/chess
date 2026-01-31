@@ -11,7 +11,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import z, { email } from "zod";
+import z from "zod";
 
 interface emailI {
   data: string;
@@ -47,7 +47,7 @@ const page = () => {
 
   const [isOtpWindowOpen, setIsOtpWindowOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [otpTime, setOtpTime] = useState<string>("00:00:00");
+  const [otpTime, setOtpTime] = useState<string>("00:00");
 
   const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
   const otpTimerOutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -245,7 +245,7 @@ const page = () => {
       if (response.expiredOn) {
         startTheOTPTimer(response.expiredOn);
       } else if (otpTimerOutRef.current) {
-        clearTimeout(otpTimerOutRef.current);
+        clearInterval(otpTimerOutRef.current);
       }
     }
 
@@ -323,16 +323,16 @@ const page = () => {
   }
 
   function startTheOTPTimer(dateTime: Date) {
-    otpTimerOutRef.current = setTimeout(() => {
+    otpTimerOutRef.current = setInterval(() => {
       const currentTime = Date.now();
       const expireTime = new Date(dateTime).getTime();
 
       const diff = expireTime - currentTime;
 
       if (diff <= 0) {
-        setOtpTime("00:00:00");
+        setOtpTime("00:00");
         if (otpTimerOutRef.current) {
-          clearTimeout(otpTimerOutRef.current);
+          clearInterval(otpTimerOutRef.current);
         }
         setIsOtpWindowOpen(false);
         setSignInData((prev) => ({
@@ -346,12 +346,10 @@ const page = () => {
         }));
       }
 
-      const hours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff / (1000 * 60)) % 60);
       const seconds = Math.floor((diff / 1000) % 60);
 
       const formatted = [
-        hours.toString().padStart(2, "0"),
         minutes.toString().padStart(2, "0"),
         seconds.toString().padStart(2, "0"),
       ].join(":");
