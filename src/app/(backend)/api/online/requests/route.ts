@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface reqBodyI {
     userId: string;
+    pageSize: number;
 }
 
 export async function POST(req: NextRequest) {
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
             isDeleted: false,
         });
 
-        return NextResponse.json({ success: true, request: userActiveRequests }, { status: 200 });
+        return NextResponse.json({ success: true, requestList: userActiveRequests.slice(0, body.pageSize) }, { status: 200 });
 
     } catch (error) {
         console.log("Something went wrong in /api/online/requests/ route", error);
