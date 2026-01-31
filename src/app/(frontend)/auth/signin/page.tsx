@@ -47,13 +47,14 @@ const page = () => {
 
   const [isOtpWindowOpen, setIsOtpWindowOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [otpTime, setOtpTime] = useState<string>("00:00");
+  const [otpTime, setOtpTime] = useState<string>("00:00:00");
 
   const otpInputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const otpTimerOutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function onChangeEventHandler(
     e: ChangeEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) {
     const input = e.target as HTMLInputElement;
     if (/[0-9]/.test(input.value)) {
@@ -80,7 +81,7 @@ const page = () => {
 
   function handleKeyDownEvent(
     e: KeyboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) {
     const key = e.key;
     const isBackspace = key === "Backspace";
@@ -241,6 +242,11 @@ const page = () => {
         },
       }));
       setIsOtpWindowOpen(true);
+      if (response.expiredOn) {
+        startTheOTPTimer(response.expiredOn);
+      } else if (otpTimerOutRef.current) {
+        clearTimeout(otpTimerOutRef.current);
+      }
     }
 
     setIsLoading(false);
@@ -314,6 +320,44 @@ const page = () => {
     }
 
     setIsLoading(false);
+  }
+
+  function startTheOTPTimer(dateTime: Date) {
+    otpTimerOutRef.current = setTimeout(() => {
+      const currentTime = Date.now();
+      const expireTime = new Date(dateTime).getTime();
+
+      const diff = expireTime - currentTime;
+
+      if (diff <= 0) {
+        setOtpTime("00:00:00");
+        if (otpTimerOutRef.current) {
+          clearTimeout(otpTimerOutRef.current);
+        }
+        setIsOtpWindowOpen(false);
+        setSignInData((prev) => ({
+          ...prev,
+          email: {
+            ...prev.email,
+            success: false,
+            message:
+              "Your email verification OTP has expired. Please enter your registered email address to generate a new OTP and complete the sign-in process.",
+          },
+        }));
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      const formatted = [
+        hours.toString().padStart(2, "0"),
+        minutes.toString().padStart(2, "0"),
+        seconds.toString().padStart(2, "0"),
+      ].join(":");
+
+      setOtpTime(formatted);
+    }, 1000);
   }
 
   return (

@@ -77,8 +77,6 @@ export async function POST(req: NextRequest) {
             expiredOn: new Date(Date.now() + 10 * 60 * 1000),
         });
 
-        console.log("newSignInVerificationData", newSignInVerificationData);
-
         const requestToSendOTPEmail = await fetch(`${process.env.APPLICATION_URL}/api/email/sendOTP`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -93,7 +91,7 @@ export async function POST(req: NextRequest) {
 
         const responseOfSendOTPEmail = await requestToSendOTPEmail.json();
 
-        return Response.json({ success: true, message: `A verification OTP has been successfully sent to your registered email address: ${user.userEmail}.` }, { status: 200 });
+        return Response.json({ success: true, message: `A verification OTP has been successfully sent to your registered email address: ${user.userEmail}.`, expiredOn: newSignInVerificationData.expiredOn }, { status: 200 });
     } catch (error) {
         console.log("Something went wrong in /api/auth/generate-otp/ route", error);
         return Response.json({ success: false, error: "Something went wrong" }, { status: 500 });
