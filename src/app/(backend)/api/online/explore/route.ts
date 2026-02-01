@@ -1,70 +1,132 @@
-import FriendRequestModel from "@/mongodb/models/FriendRequest.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
-import UserFriendModel from "@/mongodb/models/UserFriend.model";
-import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 
 interface reqBodyI {
-    userName: string;
+    userId: string;
+    pageSize: number;
 }
 
 export async function POST(req: NextRequest) {
     try {
         const body: reqBodyI = await req.json();
 
-        const userInfo = await UserAuthModel.findOne({ uniqueUserName: body.userName });
-
-        if (!userInfo) {
+        if (!mongoose.Types.ObjectId.isValid(body.userId)) {
             return NextResponse.json(
-                { success: false, message: "User not found" },
+                { success: false, error: "Invalid user" },
                 { status: 400 }
             );
-        };
+        }
 
-        const currentUserId = userInfo._id;
+        const currentUserId = new mongoose.Types.ObjectId(body.userId);
 
-        let friendsIds: mongoose.Types.ObjectId[] = [];
+        const users = await UserAuthModel.aggregate([
+            {
+                $match: {
+                    _id: { $ne: currentUserId },
+                    isActive: true,
+                    isDeleted: false,
+                },
+            },
 
-        const userFriend = await UserFriendModel.findOne({
-            userId: currentUserId,
-            isActive: true,
-            isDeleted: false,
-        }).select("friends").lean<{ friends: mongoose.Types.ObjectId[] | null }>();
+            {
+                $lookup: {
+                    from: "userfriends",
+                    let: { targetUserId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ["$userId", currentUserId] },
+                            },
+                        },
+                        {
+                            $project: {
+                                friends: 1,
+                                _id: 0,
+                            },
+                        },
+                    ],
+                    as: "friendData",
+                },
+            },
 
-        if (!userFriend) {
-            await UserFriendModel.create({ userId: currentUserId });
-        } else {
-            friendsIds = userFriend.friends || []
-        };
+            {
+                $lookup: {
+                    from: "friendrequests",
+                    let: { targetUserId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$status", "pending"] },
+                                        {
+                                            $or: [
+                                                {
+                                                    $and: [
+                                                        { $eq: ["$sentBy", currentUserId] },
+                                                        { $eq: ["$receivedBy", "$$targetUserId"] },
+                                                    ],
+                                                },
+                                                {
+                                                    $and: [
+                                                        { $eq: ["$receivedBy", currentUserId] },
+                                                        { $eq: ["$sentBy", "$$targetUserId"] },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                    as: "requestData",
+                },
+            },
 
-        const blockedRequests = await FriendRequestModel.find({
-            sendBy: currentUserId,
-            isActive: true,
-            isDeleted: false,
-            $or: [
-                { status: "pending" },
-                { isReported: true }
-            ]
-        }).select("receivedBy").lean();
+            {
+                $addFields: {
+                    isFriend: {
+                        $in: [
+                            "$_id",
+                            {
+                                $ifNull: [
+                                    { $arrayElemAt: ["$friendData.friends", 0] },
+                                    [],
+                                ],
+                            },
+                        ],
+                    },
+                    isAlreadyRequestSend: {
+                        $gt: [{ $size: "$requestData" }, 0],
+                    },
+                },
+            },
 
-        const blockedUserIds = blockedRequests.map((req) => req.receivedBy);
+            {
+                $project: {
+                    userName: "$uniqueUserName",
+                    isFriend: 1,
+                    isAlreadyRequestSend: 1,
+                    _id: 0,
+                },
+            },
 
-        const excludedUserIds = [
-            currentUserId,
-            ...friendsIds,
-            ...blockedUserIds
-        ];
+            {
+                $limit: body.pageSize || 10,
+            },
+        ]);
 
-        const users = await UserAuthModel.find({
-            _id: { $nin: excludedUserIds },
-            isActive: true,
-            isDeleted: false
-        }).select("uniqueUserName fName lName").limit(30).lean();
-
-        return NextResponse.json({ success: true, users }, { status: 200 });
-
+        return NextResponse.json(
+            { success: true, users: users },
+            { status: 200 }
+        );
     } catch (error) {
-        console.log("Something went wrong in /api/online/explore/ route", error);
-        return NextResponse.json({ success: false, error: "Something went wrong" }, { status: 500 });
+        console.error("Error in /api/online/explore", error);
+        return NextResponse.json(
+            { success: false, error: "Something went wrong" },
+            { status: 500 }
+        );
     }
 }

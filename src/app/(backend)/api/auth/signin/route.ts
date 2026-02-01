@@ -54,24 +54,26 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const uuid = uuidv4();
+        if (currentUser.isEmailVerified === false) {
+            const uuid = uuidv4();
 
-        const userEmailVerificationMapping = await EmailVerificationModel.create({
-            uuid: uuid as string,
-            userId: currentUser._id as string
-        });
+            const userEmailVerificationMapping = await EmailVerificationModel.create({
+                uuid: uuid as string,
+                userId: currentUser._id as string
+            });
 
-        const requestToSendEmailVerificationMail = await fetch(`${process.env.APPLICATION_URL}/api/email/emailVerification`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userName: `${currentUser.fName} ${currentUser.lName}`,
-                sendTo: currentUser.userEmail,
-                verifyLink: `${process.env.APPLICATION_URL}/${userEmailVerificationMapping.uuid}`,
-            })
-        });
+            const requestToSendEmailVerificationMail = await fetch(`${process.env.APPLICATION_URL}/api/email/emailVerification`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userName: `${currentUser.fName} ${currentUser.lName}`,
+                    sendTo: currentUser.userEmail,
+                    verifyLink: `${process.env.APPLICATION_URL}/${userEmailVerificationMapping.uuid}`,
+                })
+            });
 
-        const responseOfSendEmailVerificationMail = await requestToSendEmailVerificationMail.json();
+            const responseOfSendEmailVerificationMail = await requestToSendEmailVerificationMail.json();
+        }
 
         const tokenPayload: generateJWTDataType = {
             _id: currentUser._id,

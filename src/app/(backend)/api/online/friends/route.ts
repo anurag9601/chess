@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface reqBodyI {
     userId: string;
+    pageSize: number;
+    searchQuery: string;
 }
 
 export async function POST(req: NextRequest) {
@@ -29,7 +31,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: "User not found " }, { status: 400 });
         };
 
-        return NextResponse.json({ success: true, users: userFriendData.friends });
+        return NextResponse.json({ success: true, users: userFriendData.friends.slice(0, body.pageSize) });
 
     } catch (error) {
         console.log("Something went wrong in /api/online/friends/ route", error);

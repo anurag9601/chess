@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ListLoading from "../list-loading/listLoading";
 import { UserContext } from "@/context/User.context";
 
@@ -12,12 +12,14 @@ const Friends = () => {
   const [challengeQueue, setChallengeQueue] = useState<number[]>([]);
   const [friends, setFriends] = useState<friendsDataI[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const pageSizeRef = useRef<number>(10);
 
   async function getCurrentUserAllFriends(userId: string) {
     const request = await fetch("/api/online/friends", {
       method: "POST",
       body: JSON.stringify({
         userId: userId,
+        pageSize: pageSizeRef.current,
       }),
     });
 

@@ -259,7 +259,7 @@ const Header = () => {
 
         {userInfoWindowControler.isWindowOpen && (
           <div
-            className="absolute top-[45px] right-[3px] border-[1px] border-[#99a1af] shadow-lg rounded-lg h-fit w-[180px] p-[10px]"
+            className="absolute top-[45px] right-[3px] border-[1px] border-[#99a1af] shadow-lg rounded-lg h-fit w-[180px] p-[10px] bg-[#f9f6ed]"
             onClick={(e: MouseEvent<HTMLDivElement>) => {
               e.stopPropagation();
             }}
