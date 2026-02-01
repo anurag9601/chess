@@ -1,67 +1,38 @@
 import FriendRequestModel from "@/mongodb/models/FriendRequest.model";
-import UserAuthModel from "@/mongodb/models/UserAuth.model";
-import UserFriendModel from "@/mongodb/models/UserFriend.model";
-import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
+import UserFriendModel from "@/mongodb/models/UserFriend.model";
 
 interface reqBodyI {
-    userName: string;
+    userId: string;
+    pageSize: number;
 }
 
 export async function POST(req: NextRequest) {
     try {
         const body: reqBodyI = await req.json();
 
-        const userInfo = await UserAuthModel.findOne({ uniqueUserName: body.userName });
-
-        if (!userInfo) {
-            return NextResponse.json(
-                { success: false, message: "User not found" },
-                { status: 400 }
-            );
+        if (!mongoose.Types.ObjectId.isValid(body.userId)) {
+            return NextResponse.json({ success: false, error: "Invalid user" }, { status: 400 });
         };
 
-        const currentUserId = userInfo._id;
+        const currentUserId = new mongoose.Types.ObjectId(body.userId);
 
-        let friendsIds: mongoose.Types.ObjectId[] = [];
+        const activeRequests = await FriendRequestModel.find({
+            receivedBy: currentUserId,
+            status: "pending"
+        });
 
-        const userFriend = await UserFriendModel.findOne({
+        const currentUserFriends = await UserFriendModel.findOne({
             userId: currentUserId,
-            isActive: true,
-            isDeleted: false,
-        }).select("friends").lean<{ friends: mongoose.Types.ObjectId[] | null }>();
+        });
 
-        if (!userFriend) {
-            await UserFriendModel.create({ userId: currentUserId });
-        } else {
-            friendsIds = userFriend.friends || []
-        };
+        const alreadyFriends = currentUserFriends.friends ?? [];
 
-        const blockedRequests = await FriendRequestModel.find({
-            sendBy: currentUserId,
-            isActive: true,
-            isDeleted: false,
-            $or: [
-                { status: "pending" },
-                { isReported: true }
-            ]
-        }).select("receivedBy").lean();
+        console.log("activeRequests", activeRequests);
+        console.log("alreadyFriends", alreadyFriends);
 
-        const blockedUserIds = blockedRequests.map((req) => req.receivedBy);
-
-        const excludedUserIds = [
-            currentUserId,
-            ...friendsIds,
-            ...blockedUserIds
-        ];
-
-        const users = await UserAuthModel.find({
-            _id: { $nin: excludedUserIds },
-            isActive: true,
-            isDeleted: false
-        }).select("uniqueUserName fName lName").limit(30).lean();
-
-        return NextResponse.json({ success: true, users }, { status: 200 });
+        return NextResponse.json({ success: true }, { status: 200 });
 
     } catch (error) {
         console.log("Something went wrong in /api/online/explore/ route", error);

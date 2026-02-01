@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface reqBodyI {
     userId: string;
     pageSize: number;
+    searchQuery: string;
 }
 
 export async function POST(req: NextRequest) {

@@ -48,8 +48,3 @@ html, body {
 .blink-loading-animation {
   animation: blink-loading 2s ease-in-out infinite;
 }
-
-.top-to-bottom-animation {
-  transform: translateY(-5px);
-  animation: move-down .5s linear;
-}
