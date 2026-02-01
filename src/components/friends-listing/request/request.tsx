@@ -1,8 +1,8 @@
 "use client";
 
+import ListLoading from "@/components/animation/list-loading/listLoading";
 import { UserContext } from "@/context/User.context";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import ListLoading from "../list-loading/listLoading";
 
 interface friendRequestsI {}
 

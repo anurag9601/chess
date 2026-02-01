@@ -1,8 +1,9 @@
 "use client";
 
+import ListLoading from "@/components/animation/list-loading/listLoading";
+import Spinner from "@/components/animation/spinner/spinner";
 import { UserContext } from "@/context/User.context";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import ListLoading from "../list-loading/listLoading";
 
 interface exploreUserI {
   isFriend: boolean;
@@ -13,6 +14,7 @@ interface exploreUserI {
 const Explore = () => {
   const { userData } = useContext(UserContext);
   const [exploreUsers, setExploreUsers] = useState<exploreUserI[]>([]);
+  const [requestQueue, setRequestQueue] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const pageSizeRef = useRef<number>(10);
 
@@ -47,7 +49,7 @@ const Explore = () => {
         <ListLoading />
       ) : exploreUsers.length > 0 ? (
         <>
-          {exploreUsers.map((user) => (
+          {exploreUsers.map((user, index) => (
             <div
               className="flex-1 flex flex-col items-start justify-start gap-[10px] h-full w-full overflow-y-auto custom-scrollbar"
               key={user.userName}
@@ -76,7 +78,8 @@ const Explore = () => {
                   </div>
                 </div>
                 {!user.isAlreadyRequestSend && !user.isFriend && (
-                  <button className="bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[13px] px-[10px] py-[5px] rounded-lg cursor-pointer min-w-[103px]">
+                  <button className="bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[13px] px-[10px] py-[5px] rounded-lg cursor-pointer min-w-[103px] relative">
+                    {requestQueue.includes(index) && <Spinner width={20}/>}
                     Send Request
                   </button>
                 )}
