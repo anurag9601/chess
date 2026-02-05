@@ -37,6 +37,38 @@ const Explore = () => {
     setIsLoading(false);
   }
 
+  async function sendFriendRequest(requestSendUserName: string, index: number) {
+    if (!userData) return;
+
+    setRequestQueue((prev) => [...prev, index]);
+
+    const request = await fetch("/api/online/requests/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: userData._id,
+        requestUserName: requestSendUserName,
+      }),
+    });
+
+    const response = await request.json();
+
+    if (response.success === true) {
+      setExploreUsers((prev) => {
+        const updatedExploreUsers = [...prev];
+        updatedExploreUsers[index].isAlreadyRequestSend = true;
+        return updatedExploreUsers;
+      });
+    } else if (response.success === false) {
+    }
+
+    setRequestQueue((prev) => {
+      const updated_queue = [...prev];
+      updated_queue.shift();
+      return updated_queue;
+    });
+  }
+
   useEffect(() => {
     if (userData) {
       getUsersToExplore(userData._id);
@@ -78,8 +110,11 @@ const Explore = () => {
                   </div>
                 </div>
                 {!user.isAlreadyRequestSend && !user.isFriend && (
-                  <button className="bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[13px] px-[10px] py-[5px] rounded-lg cursor-pointer min-w-[103px] relative">
-                    {requestQueue.includes(index) && <Spinner width={20}/>}
+                  <button
+                    className="bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[13px] px-[10px] py-[5px] rounded-lg cursor-pointer min-w-[103px] relative"
+                    onClick={() => sendFriendRequest(user.userName, index)}
+                  >
+                    {requestQueue.includes(index) && <Spinner width={20} />}
                     Send Request
                   </button>
                 )}
