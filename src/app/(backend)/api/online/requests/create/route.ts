@@ -33,19 +33,24 @@ export async function POST(req: NextRequest) {
         });
 
         if (isAlreadyExistRequest) {
-            if (isAlreadyExistRequest.rejectionCount >= 3) {
+            if (isAlreadyExistRequest.isReported) {
+                return NextResponse.json({ success: false, error: `You have been reported by ${body.requestUserName}. You can no longer send requests to this user.` }, { status: 400 });
+            }
+            else if (isAlreadyExistRequest.rejectionCount >= 3) {
                 return NextResponse.json({ success: false, error: "Your friend request has been rejected three times. You can no longer send requests to this user." }, { status: 400 });
             } else if (isAlreadyExistRequest.isReported === true) {
                 return NextResponse.json({ success: false, error: `You have been reported by user ${body.requestUserName}. You can no longer send requests to this user.` }, { status: 400 });
             } else {
                 isAlreadyExistRequest.status = "pending";
+                isAlreadyExistRequest.isActive = true;
+                isAlreadyExistRequest.isDeleted = false;
                 await isAlreadyExistRequest.save();
 
                 return NextResponse.json({ success: true, message: `Your friend request has been successfully sent to ${body.requestUserName}.` }, { status: 200 });
             }
         };
 
-        await FriendRequestModel.create({
+        const newFriendRequest = await FriendRequestModel.create({
             sendBy: currentUserId,
             receivedBy: requestSendUser._id
         });

@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
         const token = generateJWT(tokenPayload);
 
-        const response = NextResponse.json({ success: true, message: "🎉 Congratulations! Your signin process has been successfully completed.", data: tokenPayload }, { status: 200 });
+        const response = NextResponse.json({ success: true, message: "🎉 Congratulations! Your signin process has been successfully completed.", data: tokenPayload }, { status: 201 });
 
         response.cookies.set("auth-token", token, {
             httpOnly: true,
