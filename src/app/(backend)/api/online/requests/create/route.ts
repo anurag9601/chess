@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
 import FriendRequestModel from "@/mongodb/models/FriendRequest.model";
+import UserFriendModel from "@/mongodb/models/UserFriend.model";
+import { authorizeUserAuth } from "@/functions/backend/authFunction";
+import { generateJWTDataType } from "@/lib/jsonWebtoken";
 
 interface reqBodyI {
-    userId: string;
     requestUserName: string
 };
 
@@ -15,25 +17,53 @@ export async function POST(req: NextRequest) {
 
         const body: reqBodyI = await req.json();
 
-        if (!mongoose.Types.ObjectId.isValid(body.userId)) {
-            return NextResponse.json({ success: false, error: "Invalid user" }, { status: 400 });
+        const verifyToken = authorizeUserAuth(req);
+
+        if (verifyToken.success === false || !verifyToken.data) {
+            const res = NextResponse.json({ success: verifyToken.success, error: verifyToken.error }, { status: verifyToken.status });
+
+            res.cookies.set("auth-token", "", {
+                httpOnly: true,
+                expires: new Date(0),
+            });
+
+            return res;
         };
 
-        const currentUserId = new mongoose.Types.ObjectId(body.userId);
+        const userData: generateJWTDataType = verifyToken.data;
+
+        const currentUserData = await UserAuthModel.findOne({ uniqueUserName: userData.uniqueUserName });
+
+        if (!currentUserData) {
+            return NextResponse.json({ success: false, error: "User not found." }, { status: 400 });
+        };
 
         const requestSendUser = await UserAuthModel.findOne({ uniqueUserName: body.requestUserName });
 
         if (!requestSendUser) {
             return NextResponse.json({ success: false, error: "Invalid user. Please enter a valid username to send a friend request." }, { status: 400 });
-        }
+        };
+
+        const currentUserFriends = await UserFriendModel.findOne({ userId: currentUserData._id });
+
+        if (!currentUserFriends) {
+            return NextResponse.json({ success: false, error: "Friend list model for the logged-in user was not found." }, { status: 400 });
+        };
+
+        if (currentUserFriends.friends.includes(requestSendUser._id)) {
+            return NextResponse.json({ success: false, message: `You are already friends with ${body.requestUserName}. There is no need to send another friend request.` }, { status: 200 });
+        };
 
         const isAlreadyExistRequest = await FriendRequestModel.findOne({
-            sendBy: currentUserId,
+            sendBy: currentUserData._id,
             receivedBy: requestSendUser._id
         });
 
         if (isAlreadyExistRequest) {
-            if (isAlreadyExistRequest.isReported) {
+            if (isAlreadyExistRequest.status === "pending") {
+                return NextResponse.json({ success: false, error: `You have already sent a friend request to ${body.requestUserName}. Once the user rejects the request, you will be able to send a new request.` }, { status: 400 });
+            }
+            else if (isAlreadyExistRequest.isReported) {
                 return NextResponse.json({ success: false, error: `You have been reported by ${body.requestUserName}. You can no longer send requests to this user.` }, { status: 400 });
             }
             else if (isAlreadyExistRequest.rejectionCount >= 3) {
@@ -51,7 +81,7 @@ export async function POST(req: NextRequest) {
         };
 
         const newFriendRequest = await FriendRequestModel.create({
-            sendBy: currentUserId,
+            sendBy: currentUserData._id,
             receivedBy: requestSendUser._id
         });
 

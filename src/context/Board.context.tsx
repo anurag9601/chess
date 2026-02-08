@@ -1,6 +1,6 @@
 "use client";
 
-import { initialBoard } from "@/functions/initialBoard";
+import { initialBoard } from "@/functions/frontend/initialBoard";
 import React, { createContext, Dispatch, SetStateAction } from "react";
 
 interface I {

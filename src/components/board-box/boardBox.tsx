@@ -1,15 +1,8 @@
 "use client";
 
 import { BoardContext } from "@/context/Board.context";
-import { getpieceImage } from "@/functions/initialBoard";
-import {
-  bishop,
-  king,
-  knight,
-  pawn,
-  queen,
-  rook,
-} from "@/functions/pieceStepFunction";
+import { getpieceImage } from "@/functions/frontend/initialBoard";
+import { bishop, king, knight, pawn, queen, rook } from "@/functions/frontend/pieceStepFunction";
 import React, { useContext } from "react";
 
 interface I {
