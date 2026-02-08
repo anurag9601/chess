@@ -18,11 +18,10 @@ const Explore = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const pageSizeRef = useRef<number>(10);
 
-  async function getUsersToExplore(userId: string) {
+  async function getUsersToExplore() {
     const request = await fetch("/api/online/explore", {
       method: "POST",
       body: JSON.stringify({
-        userId: userId,
         pageSize: pageSizeRef.current,
       }),
     });
@@ -46,7 +45,6 @@ const Explore = () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: userData._id,
         requestUserName: requestSendUserName,
       }),
     });
@@ -71,7 +69,7 @@ const Explore = () => {
 
   useEffect(() => {
     if (userData) {
-      getUsersToExplore(userData._id);
+      getUsersToExplore();
     }
   }, []);
 

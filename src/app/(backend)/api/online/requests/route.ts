@@ -1,10 +1,11 @@
+import { authorizeUserAuth } from "@/functions/backend/authFunction";
+import { generateJWTDataType } from "@/lib/jsonWebtoken";
 import { connectMongoDB } from "@/mongodb/connectDB";
 import FriendRequestModel from "@/mongodb/models/FriendRequest.model";
-import mongoose from "mongoose";
+import UserAuthModel from "@/mongodb/models/UserAuth.model";
 import { NextRequest, NextResponse } from "next/server";
 
 interface reqBodyI {
-    userId: string;
     pageSize: number;
     searchQuery: string;
 }
@@ -15,20 +16,40 @@ export async function POST(req: NextRequest) {
 
         const body: reqBodyI = await req.json();
 
-        if (!mongoose.Types.ObjectId.isValid(body.userId)) {
-            return NextResponse.json({ success: false, error: "Invalid user" }, { status: 400 });
+        const verifyToken = authorizeUserAuth(req);
+
+        if (verifyToken.success === false || !verifyToken.data) {
+            const res = NextResponse.json({ success: verifyToken.success, error: verifyToken.error }, { status: verifyToken.status });
+
+            res.cookies.set("auth-token", "", {
+                httpOnly: true,
+                expires: new Date(0),
+            });
+
+            return res;
         };
 
-        const currentUserId = new mongoose.Types.ObjectId(body.userId);
+        const userData: generateJWTDataType = verifyToken.data;
+
+        const currentUserData = await UserAuthModel.findOne({ uniqueUserName: userData.uniqueUserName });
+
+        if (!currentUserData) {
+            return NextResponse.json({ success: false, error: "User not found." }, { status: 400 });
+        };
 
         const userActiveRequests = await FriendRequestModel.find({
-            receivedBy: currentUserId,
+            receivedBy: currentUserData._id,
             status: "pending",
             isActive: true,
             isDeleted: false,
-        });
+        }).populate({
+            path: "sendBy",
+            select: "uniqueUserName -_id"
+        }).select("sendBy -_id");
 
-        return NextResponse.json({ success: true, requestList: userActiveRequests.slice(0, body.pageSize) }, { status: 200 });
+        const requestList = userActiveRequests.map((req) => req.sendBy.uniqueUserName);
+
+        return NextResponse.json({ success: true, requestList: requestList.slice(0, body.pageSize) }, { status: 200 });
 
     } catch (error) {
         console.log("Something went wrong in /api/online/requests/ route", error);

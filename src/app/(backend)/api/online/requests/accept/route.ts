@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import mongoose from "mongoose";
 import FriendRequestModel from "@/mongodb/models/FriendRequest.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
+import { authorizeUserAuth } from "@/functions/backend/authFunction";
+import { generateJWTDataType } from "@/lib/jsonWebtoken";
 
 interface reqBodyI {
-    userId: string;
     requestAcceptUserName: string;
 };
 
@@ -12,11 +12,26 @@ export async function POST(req: NextRequest) {
     try {
         const body: reqBodyI = await req.json();
 
-        if (!mongoose.Types.ObjectId.isValid(body.userId)) {
-            return NextResponse.json({ success: false, error: "Invalid user" }, { status: 400 });
+        const verifyToken = authorizeUserAuth(req);
+
+        if (verifyToken.success === false || !verifyToken.data) {
+            const res = NextResponse.json({ success: verifyToken.success, error: verifyToken.error }, { status: verifyToken.status });
+
+            res.cookies.set("auth-token", "", {
+                httpOnly: true,
+                expires: new Date(0),
+            });
+
+            return res;
         };
 
-        const currentUserId = new mongoose.Types.ObjectId(body.userId);
+        const userData: generateJWTDataType = verifyToken.data;
+
+        const currentUserData = await UserAuthModel.findOne({ uniqueUserName: userData.uniqueUserName });
+
+        if (!currentUserData) {
+            return NextResponse.json({ success: false, error: "User not found." }, { status: 400 });
+        };
 
         const requestSendUser = await UserAuthModel.findOne({ uniqueUserName: body.requestAcceptUserName });
 
@@ -26,7 +41,7 @@ export async function POST(req: NextRequest) {
 
         const friendRequest = await FriendRequestModel.findOne({
             sendBy: requestSendUser._id,
-            receivedBy: currentUserId,
+            receivedBy: currentUserData._id,
         });
 
         if (!friendRequest) {

@@ -14,11 +14,10 @@ const Friends = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const pageSizeRef = useRef<number>(10);
 
-  async function getCurrentUserAllFriends(userId: string) {
+  async function getCurrentUserAllFriends() {
     const request = await fetch("/api/online/friends", {
       method: "POST",
       body: JSON.stringify({
-        userId: userId,
         pageSize: pageSizeRef.current,
       }),
     });
@@ -35,7 +34,7 @@ const Friends = () => {
 
   useEffect(() => {
     if (userData) {
-      getCurrentUserAllFriends(userData._id);
+      getCurrentUserAllFriends();
     }
   }, [userData]);
   return (

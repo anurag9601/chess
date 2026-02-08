@@ -1,9 +1,9 @@
+import { authorizeUserAuth } from "@/functions/backend/authFunction";
 import { generateJWT, generateJWTDataType } from "@/lib/jsonWebtoken";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
 import { NextRequest, NextResponse } from "next/server";
 
 interface reqBodI {
-    userId: string;
     newUniqueUserName: string;
 };
 
@@ -11,25 +11,37 @@ export async function POST(req: NextRequest) {
     try {
         const body: reqBodI = await req.json();
 
-        const user = await UserAuthModel.findOne({ _id: body.userId });
+        const verifyToken = authorizeUserAuth(req);
 
-        if (!user) {
-            return Response.json(
-                { success: false, error: "User not found." },
-                { status: 404 }
-            );
-        }
+        if (verifyToken.success === false || !verifyToken.data) {
+            const res = NextResponse.json({ success: verifyToken.success, error: verifyToken.error }, { status: verifyToken.status });
 
-        user.uniqueUserName = body.newUniqueUserName;
-        await user.save();
+            res.cookies.set("auth-token", "", {
+                httpOnly: true,
+                expires: new Date(0),
+            });
+
+            return res;
+        };
+
+        const userData: generateJWTDataType = verifyToken.data;
+
+        const currentUserData = await UserAuthModel.findOne({ uniqueUserName: userData.uniqueUserName });
+
+        if (!currentUserData) {
+            return NextResponse.json({ success: false, error: "User not found." }, { status: 400 });
+        };
+
+        currentUserData.uniqueUserName = body.newUniqueUserName;
+        await currentUserData.save();
 
         const tokenPayload: generateJWTDataType = {
-            _id: user._id,
-            fName: user.fName,
-            lName: user.lName,
-            userEmail: user.userEmail,
-            uniqueUserName: user.uniqueUserName,
-            isEmailVerified: user.isEmailVerified
+            _id: currentUserData._id,
+            fName: currentUserData.fName,
+            lName: currentUserData.lName,
+            userEmail: currentUserData.userEmail,
+            uniqueUserName: currentUserData.uniqueUserName,
+            isEmailVerified: currentUserData.isEmailVerified
         };
 
         const token = generateJWT(tokenPayload);
