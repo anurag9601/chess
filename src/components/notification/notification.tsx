@@ -23,7 +23,11 @@ const Notification = () => {
   useEffect(() => {
     if (!notificationData.id) return;
 
-    setShowNotification(true);
+    setShowNotification(false);
+
+    const ref = requestAnimationFrame(() => {
+      setShowNotification(true);
+    });
 
     if (showNotificationTimeOutRef.current) {
       clearTimeout(showNotificationTimeOutRef.current);
@@ -31,9 +35,10 @@ const Notification = () => {
 
     showNotificationTimeOutRef.current = setTimeout(() => {
       setShowNotification(false);
-    }, 3000);
+    }, 2 * 1000);
 
     return () => {
+      cancelAnimationFrame(ref);
       if (showNotificationTimeOutRef.current) {
         clearTimeout(showNotificationTimeOutRef.current);
       }

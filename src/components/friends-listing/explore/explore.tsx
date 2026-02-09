@@ -45,7 +45,7 @@ const Explore = () => {
   }
 
   async function sendFriendRequest(requestSendUserName: string, index: number) {
-    if (!userData) return;
+    if (!userData || requestQueue.includes(index)) return;
 
     setRequestQueue((prev) => [...prev, index]);
 
@@ -100,12 +100,12 @@ const Explore = () => {
         <ListLoading />
       ) : exploreUsers.length > 0 ? (
         <>
-          {exploreUsers.map((user, index) => (
-            <div
-              className="flex-1 flex flex-col items-start justify-start gap-[10px] h-full w-full overflow-y-auto custom-scrollbar"
-              key={user.userName}
-            >
-              <div className="flex items-start justify-between gap-[10px] w-full bg-[#f9f6ed] p-[10px] rounded-md hover: ">
+          <div className="flex-1 flex flex-col items-start justify-start gap-[10px] h-full w-full overflow-y-auto custom-scrollbar">
+            {exploreUsers.map((user, index) => (
+              <div
+                className="flex items-start justify-between gap-[10px] w-full bg-[#f9f6ed] p-[10px] rounded-md hover: "
+                key={user.userName}
+              >
                 <div className="flex items-start justify-center gap-[10px]">
                   <img
                     src="./images/friend-request.png"
@@ -138,8 +138,8 @@ const Explore = () => {
                   </button>
                 )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </>
       ) : (
         <div className="flex-1 flex items-center justify-center">

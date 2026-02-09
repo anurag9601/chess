@@ -54,7 +54,7 @@ html, body {
 }
 
 .notification-pop-up-animation {
-  animation: popup-slide 3s ease-in-out forwards;
+  animation: popup-slide 2s ease-in-out forwards;
 }
 
 @keyframes blink-loading{
