@@ -1,5 +1,6 @@
 "use client";
 
+import { NotificationContext } from "@/context/Notification.context";
 import { UserContext } from "@/context/User.context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,6 +29,7 @@ interface otpI {
 const page = () => {
   const router = useRouter();
   const { setUserData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
 
   const [signInData, setSignInData] = useState<{
     email: emailI;
@@ -232,6 +234,12 @@ const page = () => {
           message: response.error,
         },
       }));
+
+      setNotificationData({
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+      });
     } else if (response.success === true) {
       setSignInData((prev) => ({
         ...prev,
@@ -241,6 +249,13 @@ const page = () => {
           message: response.message,
         },
       }));
+
+      setNotificationData({
+        notificationMessage: response.success,
+        notificationChildMessages: [],
+        notificationType: "success",
+      });
+
       setIsOtpWindowOpen(true);
       if (response.expiredOn) {
         startTheOTPTimer(response.expiredOn);
@@ -306,6 +321,12 @@ const page = () => {
           message: response.error,
         },
       }));
+
+      setNotificationData({
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+      });
     } else if (response.success === true) {
       setSignInData((prev) => ({
         ...prev,
@@ -315,6 +336,12 @@ const page = () => {
           message: response.message,
         },
       }));
+
+      setNotificationData({
+        notificationMessage: response.success,
+        notificationChildMessages: [],
+        notificationType: "success",
+      });
       router.push("/");
       setUserData(response.data);
     }

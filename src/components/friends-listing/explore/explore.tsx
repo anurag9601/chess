@@ -2,6 +2,7 @@
 
 import ListLoading from "@/components/animation/list-loading/listLoading";
 import Spinner from "@/components/animation/spinner/spinner";
+import { NotificationContext } from "@/context/Notification.context";
 import { UserContext } from "@/context/User.context";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
@@ -13,6 +14,7 @@ interface exploreUserI {
 
 const Explore = () => {
   const { userData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
   const [exploreUsers, setExploreUsers] = useState<exploreUserI[]>([]);
   const [requestQueue, setRequestQueue] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -29,6 +31,11 @@ const Explore = () => {
     const response = await request.json();
 
     if (!response.success) {
+      setNotificationData({
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+      });
     } else if (response.success) {
       setExploreUsers(response.users);
     }
@@ -57,7 +64,18 @@ const Explore = () => {
         updatedExploreUsers[index].isAlreadyRequestSend = true;
         return updatedExploreUsers;
       });
+
+      setNotificationData({
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+      });
     } else if (response.success === false) {
+      setNotificationData({
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+      });
     }
 
     setRequestQueue((prev) => {

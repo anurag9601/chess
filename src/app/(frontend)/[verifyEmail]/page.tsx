@@ -1,5 +1,6 @@
 "use client";
 
+import { NotificationContext } from "@/context/Notification.context";
 import { UserContext } from "@/context/User.context";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
@@ -12,7 +13,7 @@ interface statusDataTypeI {
 const page = () => {
   const pathName = usePathname();
   const router = useRouter();
-  const { userData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
 
   const [isVerifying, setIsVerifying] = useState<boolean>(true);
   const [status, setStatus] = useState<statusDataTypeI>({
@@ -36,10 +37,22 @@ const page = () => {
         success: true,
         message: response.message,
       });
+
+      setNotificationData({
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+      });
     } else {
       setStatus({
         success: false,
         message: response.error,
+      });
+
+      setNotificationData({
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
       });
     }
 

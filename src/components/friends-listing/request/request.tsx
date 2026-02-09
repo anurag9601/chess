@@ -1,11 +1,13 @@
 "use client";
 
 import ListLoading from "@/components/animation/list-loading/listLoading";
+import { NotificationContext } from "@/context/Notification.context";
 import { UserContext } from "@/context/User.context";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 const Request = () => {
   const { userData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
   const [requests, setRequests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const pageSizeRef = useRef<number>(10);
@@ -24,6 +26,11 @@ const Request = () => {
     console.log("response", response);
 
     if (!response.success) {
+      setNotificationData({
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+      });
     } else if (response.success) {
       setRequests(response.requestList);
     }
@@ -47,7 +54,17 @@ const Request = () => {
     console.log("response", response);
 
     if (response.success === false) {
+      setNotificationData({
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+      });
     } else if (response.success === true) {
+      setNotificationData({
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+      });
     }
   }
 

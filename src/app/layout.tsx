@@ -4,8 +4,10 @@ import "./globals.css";
 import BoardContextProvider from "@/context/Board.context";
 import UserContextProvider from "@/context/User.context";
 import AuthInitializer from "@/components/auth-initializer/AuthInitializer";
-import MusicContextProvider from "@/context/music.context";
+import MusicContextProvider from "@/context/Music.context";
 import Header from "@/components/header/header";
+import NotificationContextProvider from "@/context/Notification.context";
+import Notification from "@/components/notification/notification";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,9 +37,12 @@ export default function RootLayout({
         <UserContextProvider>
           <BoardContextProvider>
             <MusicContextProvider>
-              <AuthInitializer />
-              <Header />
-              {children}
+              <NotificationContextProvider>
+                <Notification />
+                <AuthInitializer />
+                <Header />
+                {children}
+              </NotificationContextProvider>
             </MusicContextProvider>
           </BoardContextProvider>
         </UserContextProvider>
