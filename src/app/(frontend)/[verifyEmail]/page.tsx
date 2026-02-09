@@ -39,6 +39,7 @@ const page = () => {
       });
 
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
@@ -50,6 +51,7 @@ const page = () => {
       });
 
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",

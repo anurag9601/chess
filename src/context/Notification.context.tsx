@@ -9,6 +9,7 @@ import {
 } from "react";
 
 interface notificationI {
+  id: number;
   notificationMessage: string;
   notificationChildMessages: string[];
   notificationType: "success" | "error" | "warning" | "info" | "";
@@ -21,6 +22,7 @@ interface I {
 
 export const NotificationContext = createContext<I>({
   notificationData: {
+    id: 0,
     notificationMessage: "",
     notificationChildMessages: [],
     notificationType: "",
@@ -30,6 +32,7 @@ export const NotificationContext = createContext<I>({
 
 const NotificationContextProvider = ({ children }: { children: ReactNode }) => {
   const [notificationData, setNotificationData] = useState<notificationI>({
+    id: 0,
     notificationMessage: "",
     notificationChildMessages: [],
     notificationType: "",

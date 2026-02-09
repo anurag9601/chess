@@ -32,6 +32,7 @@ const Explore = () => {
 
     if (!response.success) {
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
@@ -66,12 +67,14 @@ const Explore = () => {
       });
 
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
       });
     } else if (response.success === false) {
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",

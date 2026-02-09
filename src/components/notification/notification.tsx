@@ -21,22 +21,13 @@ const Notification = () => {
   > | null>(null);
 
   useEffect(() => {
-    if (
-      !notificationData.notificationMessage &&
-      notificationData.notificationChildMessages.length === 0 &&
-      !notificationData.notificationType
-    )
-      return;
+    if (!notificationData.id) return;
+
+    setShowNotification(true);
 
     if (showNotificationTimeOutRef.current) {
       clearTimeout(showNotificationTimeOutRef.current);
     }
-
-    if (showNotification) {
-      setShowNotification(false);
-    }
-
-    setShowNotification(true);
 
     showNotificationTimeOutRef.current = setTimeout(() => {
       setShowNotification(false);
@@ -45,15 +36,9 @@ const Notification = () => {
     return () => {
       if (showNotificationTimeOutRef.current) {
         clearTimeout(showNotificationTimeOutRef.current);
-
-        setNotificationData({
-          notificationMessage: "",
-          notificationChildMessages: [],
-          notificationType: "",
-        });
       }
     };
-  }, [NotificationContext]);
+  }, [notificationData]);
 
   return (
     <>
@@ -64,9 +49,9 @@ const Notification = () => {
   ${backgroundMapOnNotificationType[notificationData.notificationType]}
   flex flex-col gap-[10px] notification-pop-up-animation`}
         >
-          {notificationData.notificationChildMessages && (
+          {notificationData.notificationMessage && (
             <p className="text-[13px] font-[700]">
-              {notificationData.notificationChildMessages}
+              {notificationData.notificationMessage}
             </p>
           )}
           {notificationData.notificationChildMessages && (

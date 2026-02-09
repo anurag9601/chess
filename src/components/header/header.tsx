@@ -1,4 +1,5 @@
 "use client";
+import { NotificationContext } from "@/context/Notification.context";
 import { UserContext } from "@/context/User.context";
 import react, {
   ChangeEvent,
@@ -21,6 +22,7 @@ interface editUserNameI {
 
 const Header = () => {
   const { userData, setUserData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
   const userInfoContainerRef = useRef<HTMLDivElement | null>(null);
   const [userInfoWindowControler, setUserInfoWindowControler] = useState<{
     isWindowOpen: boolean;
@@ -125,6 +127,13 @@ const Header = () => {
               message: response.error,
             },
           }));
+
+          setNotificationData({
+            id: Date.now(),
+            notificationMessage: response.error,
+            notificationChildMessages: [],
+            notificationType: "error",
+          });
         } else if (response.success) {
           setUserInfoWindowControler((prev) => ({
             ...prev,
@@ -137,6 +146,14 @@ const Header = () => {
                 "Great! This username is available. Press Enter to proceed.",
             },
           }));
+
+          setNotificationData({
+            id: Date.now(),
+            notificationMessage:
+              "Great! This username is available. Press Enter to proceed.",
+            notificationChildMessages: [],
+            notificationType: "success",
+          });
         }
       } catch (error) {
         console.error("Error validating email:", error);
@@ -147,9 +164,16 @@ const Header = () => {
             data: input,
             isLoading: false,
             success: false,
-            message: "Network error. Try again.",
+            message: "Network error. Please try again.",
           },
         }));
+
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: "Network error. Please try again.",
+          notificationChildMessages: [],
+          notificationType: "error",
+        });
       }
     }, 1000);
   }
@@ -169,8 +193,6 @@ const Header = () => {
     });
 
     const response = await request.json();
-
-    console.log("response", response);
 
     if (response.success === true) {
       setUserData((prev) => {
@@ -192,6 +214,20 @@ const Header = () => {
           message: "",
         },
       }));
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+      });
+    } else if (response.success === false) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+      });
     }
   }
 
@@ -201,9 +237,23 @@ const Header = () => {
     const response = await request.json();
 
     if (response.success === true) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+      });
+
       setTimeout(() => {
         window.location.reload();
       }, 500);
+    } else if (response.success === false) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+      });
     }
   }
 

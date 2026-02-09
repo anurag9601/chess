@@ -28,6 +28,7 @@ const Friends = () => {
 
     if (!response.success) {
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",

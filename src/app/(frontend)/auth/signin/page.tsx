@@ -236,6 +236,7 @@ const page = () => {
       }));
 
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
@@ -251,7 +252,8 @@ const page = () => {
       }));
 
       setNotificationData({
-        notificationMessage: response.success,
+        id: Date.now(),
+        notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
       });
@@ -323,6 +325,7 @@ const page = () => {
       }));
 
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
@@ -338,7 +341,8 @@ const page = () => {
       }));
 
       setNotificationData({
-        notificationMessage: response.success,
+        id: Date.now(),
+        notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
       });

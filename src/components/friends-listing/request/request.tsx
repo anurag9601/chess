@@ -27,6 +27,7 @@ const Request = () => {
 
     if (!response.success) {
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
@@ -55,12 +56,14 @@ const Request = () => {
 
     if (response.success === false) {
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
       });
     } else if (response.success === true) {
       setNotificationData({
+        id: Date.now(),
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
