@@ -31,6 +31,8 @@ const Request = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
       });
     } else if (response.success) {
       setRequests(response.requestList);
@@ -42,33 +44,50 @@ const Request = () => {
   async function acceptFriendRequest(requestAcceptUserName: string) {
     if (!userData) return;
 
-    const request = await fetch("/api/requests/accept", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        requestAcceptUserName,
-      }),
+    setNotificationData({
+      id: Date.now(),
+      notificationMessage: `Confirm Friend Request Access`,
+      notificationChildMessages: [
+        `Do you want to accept the friend request from ${requestAcceptUserName}?`,
+        "Accepting this request will add the user to your friends list",
+        "Once added, you can play online and interact with this user",
+      ],
+      notificationType: "",
+      animationType: "alert",
+      showActionButtons: true,
     });
 
-    const response = await request.json();
+    // const request = await fetch("/api/requests/accept", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     requestAcceptUserName,
+    //   }),
+    // });
 
-    console.log("response", response);
+    // const response = await request.json();
 
-    if (response.success === false) {
-      setNotificationData({
-        id: Date.now(),
-        notificationMessage: response.error,
-        notificationChildMessages: [],
-        notificationType: "error",
-      });
-    } else if (response.success === true) {
-      setNotificationData({
-        id: Date.now(),
-        notificationMessage: response.message,
-        notificationChildMessages: [],
-        notificationType: "success",
-      });
-    }
+    // console.log("response", response);
+
+    // if (response.success === false) {
+    //   setNotificationData({
+    //     id: Date.now(),
+    //     notificationMessage: response.error,
+    //     notificationChildMessages: [],
+    //     notificationType: "error",
+    //     animationType: "notification",
+    //     showActionButtons: false,
+    //   });
+    // } else if (response.success === true) {
+    //   setNotificationData({
+    //     id: Date.now(),
+    //     notificationMessage: response.message,
+    //     notificationChildMessages: [],
+    //     notificationType: "success",
+    //     animationType: "notification",
+    //     showActionButtons: false,
+    //   });
+    // }
   }
 
   async function rejectFriendRequest() {}
@@ -108,6 +127,7 @@ const Request = () => {
                   src="/images/black-accept.png"
                   alt="accept"
                   className="h-[20px] w-[20px] cursor-pointer"
+                  onClick={() => acceptFriendRequest(userName)}
                 />
               </div>
             </div>

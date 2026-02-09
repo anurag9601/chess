@@ -59,6 +59,8 @@ const Header = () => {
   }
 
   async function onChangeOfUniqueUserName(e: ChangeEvent<HTMLInputElement>) {
+    if (!userData) return;
+
     const input = e.target.value;
 
     if (input.length === 0) {
@@ -87,6 +89,32 @@ const Header = () => {
           message: "A unique username must be at least 3 characters long.",
         },
       }));
+
+      if (debouncingTimeId.current) clearTimeout(debouncingTimeId.current);
+      return;
+    }
+
+    if (input === userData.uniqueUserName) {
+      setUserInfoWindowControler((prev) => ({
+        ...prev,
+        editUserNameData: {
+          ...prev.editUserNameData,
+          data: input,
+          isLoading: false,
+          success: false,
+          message:
+            "The username you entered is already your current unique username and cannot be updated.",
+        },
+      }));
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage:
+          "The username you entered is already your current unique username and cannot be updated.",
+        notificationChildMessages: [],
+        notificationType: "error",
+        showActionButtons: false,
+      });
 
       if (debouncingTimeId.current) clearTimeout(debouncingTimeId.current);
       return;
@@ -220,6 +248,7 @@ const Header = () => {
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
+        showActionButtons: false,
       });
     } else if (response.success === false) {
       setNotificationData({
@@ -227,6 +256,7 @@ const Header = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        showActionButtons: false,
       });
     }
   }
@@ -242,6 +272,7 @@ const Header = () => {
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
+        showActionButtons: false,
       });
 
       setTimeout(() => {
@@ -253,6 +284,7 @@ const Header = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        showActionButtons: false,
       });
     }
   }

@@ -13,6 +13,8 @@ interface notificationI {
   notificationMessage: string;
   notificationChildMessages: string[];
   notificationType: "success" | "error" | "warning" | "info" | "";
+  animationType: "notification" | "alert",
+  showActionButtons: boolean;
 }
 
 interface I {
@@ -26,6 +28,8 @@ export const NotificationContext = createContext<I>({
     notificationMessage: "",
     notificationChildMessages: [],
     notificationType: "",
+    animationType: "notification",
+    showActionButtons: false,
   },
   setNotificationData: () => {},
 });
@@ -36,6 +40,8 @@ const NotificationContextProvider = ({ children }: { children: ReactNode }) => {
     notificationMessage: "",
     notificationChildMessages: [],
     notificationType: "",
+    animationType: "notification",
+    showActionButtons: false,
   });
 
   const values = {

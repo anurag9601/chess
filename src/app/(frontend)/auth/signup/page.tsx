@@ -124,6 +124,8 @@ const page = () => {
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
       });
       router.push("/auth/signin");
     } else {
@@ -132,6 +134,8 @@ const page = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
       });
     }
 
@@ -190,6 +194,8 @@ const page = () => {
             notificationMessage: response.error,
             notificationChildMessages: [],
             notificationType: "error",
+            animationType: "notification",
+            showActionButtons: false,
           });
         } else {
           setFormError((prev) => ({
@@ -202,6 +208,8 @@ const page = () => {
             notificationMessage: response.message,
             notificationChildMessages: [],
             notificationType: "success",
+            animationType: "notification",
+            showActionButtons: false,
           });
         }
 
@@ -281,6 +289,8 @@ const page = () => {
             notificationMessage: response.error,
             notificationChildMessages: [],
             notificationType: "error",
+            animationType: "notification",
+            showActionButtons: false,
           });
         } else {
           setFormError((prev) => ({
@@ -296,6 +306,8 @@ const page = () => {
             notificationMessage: response.message,
             notificationChildMessages: [],
             notificationType: "success",
+            animationType: "notification",
+            showActionButtons: false,
           });
         }
 

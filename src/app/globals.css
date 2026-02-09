@@ -57,6 +57,10 @@ html, body {
   animation: popup-slide 2s ease-in-out forwards;
 }
 
+.alert-pop-up-animation {
+  animation: alert-slide .5s ease-in-out forwards;
+}
+
 @keyframes blink-loading{
   0% {
     opacity: 0;
@@ -95,5 +99,17 @@ html, body {
   100% {
     transform: translate(-50%, -150%);
     opacity: 0;
+  }
+}
+
+@keyframes alert-slide {
+  0% {
+    transform: translate(-50%, -150%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate(-50%, 0%);
+    opacity: 1;
   }
 }

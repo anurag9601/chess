@@ -32,6 +32,8 @@ const Friends = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
       });
     } else if (response.success) {
       setFriends(response.users);

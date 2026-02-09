@@ -43,6 +43,8 @@ const page = () => {
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
       });
     } else {
       setStatus({
@@ -55,6 +57,8 @@ const page = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
       });
     }
 

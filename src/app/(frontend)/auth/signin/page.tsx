@@ -240,6 +240,8 @@ const page = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
       });
     } else if (response.success === true) {
       setSignInData((prev) => ({
@@ -256,6 +258,8 @@ const page = () => {
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
       });
 
       setIsOtpWindowOpen(true);
@@ -329,6 +333,8 @@ const page = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
       });
     } else if (response.success === true) {
       setSignInData((prev) => ({
@@ -345,6 +351,8 @@ const page = () => {
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
       });
       router.push("/");
       setUserData(response.data);

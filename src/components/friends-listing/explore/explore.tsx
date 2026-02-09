@@ -36,6 +36,8 @@ const Explore = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
       });
     } else if (response.success) {
       setExploreUsers(response.users);
@@ -71,6 +73,8 @@ const Explore = () => {
         notificationMessage: response.message,
         notificationChildMessages: [],
         notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
       });
     } else if (response.success === false) {
       setNotificationData({
@@ -78,6 +82,8 @@ const Explore = () => {
         notificationMessage: response.error,
         notificationChildMessages: [],
         notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
       });
     }
 
