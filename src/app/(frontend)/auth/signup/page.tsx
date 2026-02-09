@@ -1,10 +1,12 @@
 "use client";
 
+import { NotificationContext } from "@/context/Notification.context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, {
   ChangeEvent,
   FormEvent,
+  useContext,
   useRef,
   useState,
 } from "react";
@@ -29,6 +31,8 @@ interface validationInterface {
 
 const page = () => {
   const router = useRouter();
+
+  const { setNotificationData } = useContext(NotificationContext);
 
   const [formError, setFormError] = useState<
     Record<string, validationInterface>
@@ -57,7 +61,7 @@ const page = () => {
 
   function onInputValueChange(
     event: ChangeEvent<HTMLInputElement>,
-    field: string
+    field: string,
   ) {
     const input = event.target.value;
 
@@ -115,9 +119,24 @@ const page = () => {
     const response = await request.json();
 
     if (response.success) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
+      });
       router.push("/auth/signin");
     } else {
-      alert(response.error);
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
+      });
     }
 
     setLoading({
@@ -169,11 +188,29 @@ const page = () => {
             ...prev,
             userEmail: { success: false, message: response.error },
           }));
+
+          setNotificationData({
+            id: Date.now(),
+            notificationMessage: response.error,
+            notificationChildMessages: [],
+            notificationType: "error",
+            animationType: "notification",
+            showActionButtons: false,
+          });
         } else {
           setFormError((prev) => ({
             ...prev,
             userEmail: { success: true, message: response.message },
           }));
+
+          setNotificationData({
+            id: Date.now(),
+            notificationMessage: response.message,
+            notificationChildMessages: [],
+            notificationType: "success",
+            animationType: "notification",
+            showActionButtons: false,
+          });
         }
 
         setLoading({
@@ -246,6 +283,15 @@ const page = () => {
               message: response.error,
             },
           }));
+
+          setNotificationData({
+            id: Date.now(),
+            notificationMessage: response.error,
+            notificationChildMessages: [],
+            notificationType: "error",
+            animationType: "notification",
+            showActionButtons: false,
+          });
         } else {
           setFormError((prev) => ({
             ...prev,
@@ -254,6 +300,15 @@ const page = () => {
               message: response.message,
             },
           }));
+
+          setNotificationData({
+            id: Date.now(),
+            notificationMessage: response.message,
+            notificationChildMessages: [],
+            notificationType: "success",
+            animationType: "notification",
+            showActionButtons: false,
+          });
         }
 
         setLoading({

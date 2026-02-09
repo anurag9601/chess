@@ -1,6 +1,6 @@
 "use client";
 
-import { MusicContext } from "@/context/music.context";
+import { MusicContext } from "@/context/Music.context";
 import Link from "next/link";
 import React, { useContext, useEffect, useState } from "react";
 

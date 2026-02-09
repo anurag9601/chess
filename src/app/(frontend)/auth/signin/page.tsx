@@ -1,5 +1,6 @@
 "use client";
 
+import { NotificationContext } from "@/context/Notification.context";
 import { UserContext } from "@/context/User.context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,6 +29,7 @@ interface otpI {
 const page = () => {
   const router = useRouter();
   const { setUserData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
 
   const [signInData, setSignInData] = useState<{
     email: emailI;
@@ -232,6 +234,15 @@ const page = () => {
           message: response.error,
         },
       }));
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
+      });
     } else if (response.success === true) {
       setSignInData((prev) => ({
         ...prev,
@@ -241,6 +252,16 @@ const page = () => {
           message: response.message,
         },
       }));
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
+      });
+
       setIsOtpWindowOpen(true);
       if (response.expiredOn) {
         startTheOTPTimer(response.expiredOn);
@@ -306,6 +327,15 @@ const page = () => {
           message: response.error,
         },
       }));
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
+      });
     } else if (response.success === true) {
       setSignInData((prev) => ({
         ...prev,
@@ -315,6 +345,15 @@ const page = () => {
           message: response.message,
         },
       }));
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
+      });
       router.push("/");
       setUserData(response.data);
     }

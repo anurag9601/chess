@@ -3,11 +3,13 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "@/context/User.context";
 import ListLoading from "@/components/animation/list-loading/listLoading";
+import { NotificationContext } from "@/context/Notification.context";
 
 interface friendsDataI {}
 
 const Friends = () => {
   const { userData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
 
   const [challengeQueue, setChallengeQueue] = useState<number[]>([]);
   const [friends, setFriends] = useState<friendsDataI[]>([]);
@@ -25,6 +27,14 @@ const Friends = () => {
     const response = await request.json();
 
     if (!response.success) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
+      });
     } else if (response.success) {
       setFriends(response.users);
     }

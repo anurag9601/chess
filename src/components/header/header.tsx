@@ -1,4 +1,5 @@
 "use client";
+import { NotificationContext } from "@/context/Notification.context";
 import { UserContext } from "@/context/User.context";
 import react, {
   ChangeEvent,
@@ -21,6 +22,7 @@ interface editUserNameI {
 
 const Header = () => {
   const { userData, setUserData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
   const userInfoContainerRef = useRef<HTMLDivElement | null>(null);
   const [userInfoWindowControler, setUserInfoWindowControler] = useState<{
     isWindowOpen: boolean;
@@ -57,6 +59,8 @@ const Header = () => {
   }
 
   async function onChangeOfUniqueUserName(e: ChangeEvent<HTMLInputElement>) {
+    if (!userData) return;
+
     const input = e.target.value;
 
     if (input.length === 0) {
@@ -85,6 +89,32 @@ const Header = () => {
           message: "A unique username must be at least 3 characters long.",
         },
       }));
+
+      if (debouncingTimeId.current) clearTimeout(debouncingTimeId.current);
+      return;
+    }
+
+    if (input === userData.uniqueUserName) {
+      setUserInfoWindowControler((prev) => ({
+        ...prev,
+        editUserNameData: {
+          ...prev.editUserNameData,
+          data: input,
+          isLoading: false,
+          success: false,
+          message:
+            "The username you entered is already your current unique username and cannot be updated.",
+        },
+      }));
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage:
+          "The username you entered is already your current unique username and cannot be updated.",
+        notificationChildMessages: [],
+        notificationType: "error",
+        showActionButtons: false,
+      });
 
       if (debouncingTimeId.current) clearTimeout(debouncingTimeId.current);
       return;
@@ -125,6 +155,13 @@ const Header = () => {
               message: response.error,
             },
           }));
+
+          setNotificationData({
+            id: Date.now(),
+            notificationMessage: response.error,
+            notificationChildMessages: [],
+            notificationType: "error",
+          });
         } else if (response.success) {
           setUserInfoWindowControler((prev) => ({
             ...prev,
@@ -137,6 +174,14 @@ const Header = () => {
                 "Great! This username is available. Press Enter to proceed.",
             },
           }));
+
+          setNotificationData({
+            id: Date.now(),
+            notificationMessage:
+              "Great! This username is available. Press Enter to proceed.",
+            notificationChildMessages: [],
+            notificationType: "success",
+          });
         }
       } catch (error) {
         console.error("Error validating email:", error);
@@ -147,9 +192,16 @@ const Header = () => {
             data: input,
             isLoading: false,
             success: false,
-            message: "Network error. Try again.",
+            message: "Network error. Please try again.",
           },
         }));
+
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: "Network error. Please try again.",
+          notificationChildMessages: [],
+          notificationType: "error",
+        });
       }
     }, 1000);
   }
@@ -169,8 +221,6 @@ const Header = () => {
     });
 
     const response = await request.json();
-
-    console.log("response", response);
 
     if (response.success === true) {
       setUserData((prev) => {
@@ -192,6 +242,22 @@ const Header = () => {
           message: "",
         },
       }));
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+        showActionButtons: false,
+      });
+    } else if (response.success === false) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+        showActionButtons: false,
+      });
     }
   }
 
@@ -201,9 +267,25 @@ const Header = () => {
     const response = await request.json();
 
     if (response.success === true) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+        showActionButtons: false,
+      });
+
       setTimeout(() => {
         window.location.reload();
       }, 500);
+    } else if (response.success === false) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+        showActionButtons: false,
+      });
     }
   }
 

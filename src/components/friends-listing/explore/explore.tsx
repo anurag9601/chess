@@ -2,6 +2,7 @@
 
 import ListLoading from "@/components/animation/list-loading/listLoading";
 import Spinner from "@/components/animation/spinner/spinner";
+import { NotificationContext } from "@/context/Notification.context";
 import { UserContext } from "@/context/User.context";
 import React, { useContext, useEffect, useRef, useState } from "react";
 
@@ -13,6 +14,7 @@ interface exploreUserI {
 
 const Explore = () => {
   const { userData } = useContext(UserContext);
+  const { setNotificationData } = useContext(NotificationContext);
   const [exploreUsers, setExploreUsers] = useState<exploreUserI[]>([]);
   const [requestQueue, setRequestQueue] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -29,6 +31,14 @@ const Explore = () => {
     const response = await request.json();
 
     if (!response.success) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
+      });
     } else if (response.success) {
       setExploreUsers(response.users);
     }
@@ -37,7 +47,7 @@ const Explore = () => {
   }
 
   async function sendFriendRequest(requestSendUserName: string, index: number) {
-    if (!userData) return;
+    if (!userData || requestQueue.includes(index)) return;
 
     setRequestQueue((prev) => [...prev, index]);
 
@@ -57,7 +67,24 @@ const Explore = () => {
         updatedExploreUsers[index].isAlreadyRequestSend = true;
         return updatedExploreUsers;
       });
+
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.message,
+        notificationChildMessages: [],
+        notificationType: "success",
+        animationType: "notification",
+        showActionButtons: false,
+      });
     } else if (response.success === false) {
+      setNotificationData({
+        id: Date.now(),
+        notificationMessage: response.error,
+        notificationChildMessages: [],
+        notificationType: "error",
+        animationType: "notification",
+        showActionButtons: false,
+      });
     }
 
     setRequestQueue((prev) => {
@@ -79,12 +106,12 @@ const Explore = () => {
         <ListLoading />
       ) : exploreUsers.length > 0 ? (
         <>
-          {exploreUsers.map((user, index) => (
-            <div
-              className="flex-1 flex flex-col items-start justify-start gap-[10px] h-full w-full overflow-y-auto custom-scrollbar"
-              key={user.userName}
-            >
-              <div className="flex items-start justify-between gap-[10px] w-full bg-[#f9f6ed] p-[10px] rounded-md hover: ">
+          <div className="flex-1 flex flex-col items-start justify-start gap-[10px] h-full w-full overflow-y-auto custom-scrollbar">
+            {exploreUsers.map((user, index) => (
+              <div
+                className="flex items-start justify-between gap-[10px] w-full bg-[#f9f6ed] p-[10px] rounded-md hover: "
+                key={user.userName}
+              >
                 <div className="flex items-start justify-center gap-[10px]">
                   <img
                     src="./images/friend-request.png"
@@ -117,8 +144,8 @@ const Explore = () => {
                   </button>
                 )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </>
       ) : (
         <div className="flex-1 flex items-center justify-center">
