@@ -127,7 +127,7 @@ const Request = () => {
                   src="/images/black-accept.png"
                   alt="accept"
                   className="h-[20px] w-[20px] cursor-pointer"
-                  onClick={() => acceptFriendRequest(userName)}
+                  onMouseDown={() => acceptFriendRequest(userName)}
                 />
               </div>
             </div>

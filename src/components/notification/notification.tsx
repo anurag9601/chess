@@ -1,10 +1,17 @@
 "use client";
 
 import { NotificationContext } from "@/context/Notification.context";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  MouseEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 const Notification = () => {
-  const { notificationData } = useContext(NotificationContext);
+  const { notificationData, setNotificationData } =
+    useContext(NotificationContext);
 
   const backgroundMapOnNotificationType = {
     success: "bg-green-50 border-green-400 text-green-800",
@@ -18,6 +25,40 @@ const Notification = () => {
   const showNotificationTimeOutRef = useRef<ReturnType<
     typeof setTimeout
   > | null>(null);
+  const [closeAlert, setCloseAlert] = useState<boolean>(false);
+  const notificationContainerRef = useRef<HTMLDivElement | null>(null);
+
+  function closeAlertBox() {
+    setCloseAlert(true);
+
+    const timeout = setTimeout(() => {
+      setShowNotification(false);
+      setCloseAlert(false);
+      clearTimeout(timeout);
+
+      setNotificationData({
+        id: 0,
+        notificationMessage: "",
+        notificationChildMessages: [],
+        notificationType: "",
+        animationType: "notification",
+        showActionButtons: false,
+      });
+    }, 0.5 * 1000);
+
+    if (showNotificationTimeOutRef.current) {
+      clearTimeout(showNotificationTimeOutRef.current);
+    }
+  }
+
+  function handleMouseClickEvent(e: MouseEvent) {
+    console.log("e", e);
+    if (!notificationContainerRef.current) return;
+
+    if (notificationContainerRef.current.contains(e.target as Node)) return;
+
+    closeAlertBox();
+  }
 
   useEffect(() => {
     if (!notificationData.id) return;
@@ -36,7 +77,7 @@ const Notification = () => {
 
     showNotificationTimeOutRef.current = setTimeout(() => {
       setShowNotification(false);
-    }, 2 * 1000);
+    }, 2000);
 
     return () => {
       cancelAnimationFrame(ref);
@@ -46,14 +87,25 @@ const Notification = () => {
     };
   }, [notificationData]);
 
+  useEffect(() => {
+    if (notificationData.animationType !== "alert") return;
+
+    document.addEventListener("mousedown", handleMouseClickEvent);
+
+    return () => {
+      document.removeEventListener("mousedown", handleMouseClickEvent);
+    };
+  }, [notificationData]);
+
   return (
     <>
       {showNotification && (
         <div
           className={`fixed top-2 left-1/2 max-w-[350px] min-w-[250px]
-  rounded-lg py-[10px] px-[15px] border shadow-lg
-  ${backgroundMapOnNotificationType[notificationData.notificationType]}
-  flex flex-col gap-[10px] ${notificationData.animationType === "notification" ? "notification-pop-up-animation" : "alert-pop-up-animation"}`}
+          rounded-lg py-[10px] px-[15px] border shadow-lg
+          ${backgroundMapOnNotificationType[notificationData.notificationType]}
+          flex flex-col gap-[10px] ${notificationData.animationType === "notification" ? "notification-pop-up-animation" : closeAlert === false ? "alert-pop-up-open-animation" : "alert-pop-up-close-animation"}`}
+          ref={notificationContainerRef}
         >
           {notificationData.notificationMessage && (
             <p className="text-[13px] font-[700]">
@@ -77,7 +129,10 @@ const Notification = () => {
 
           {notificationData.showActionButtons === true && (
             <div className="flex items-center justify-end gap-[10px]">
-              <button className="text-black border-[1px] hover:text-[#f9f6ed] font-[600] rounded-md hover:bg-black duration-300 text-[14px] px-[10px] py-[5px] cursor-pointer">
+              <button
+                className="text-black border-[1px] hover:text-[#f9f6ed] font-[600] rounded-md hover:bg-black duration-300 text-[14px] px-[10px] py-[5px] cursor-pointer"
+                onClick={closeAlertBox}
+              >
                 Cancel
               </button>
               <button className="bg-black border-[1px] text-[#f9f6ed] font-[600] rounded-md hover:bg-neutral-600 duration-300 text-[14px] px-[10px] py-[5px] cursor-pointer">
