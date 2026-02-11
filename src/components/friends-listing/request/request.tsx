@@ -7,7 +7,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 
 const Request = () => {
   const { userData } = useContext(UserContext);
-  const { setNotificationData } = useContext(NotificationContext);
+  const { setNotificationData, showAlert } = useContext(NotificationContext);
   const [requests, setRequests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const pageSizeRef = useRef<number>(10);
@@ -44,8 +44,7 @@ const Request = () => {
   async function acceptFriendRequest(requestAcceptUserName: string) {
     if (!userData) return;
 
-    setNotificationData({
-      id: Date.now(),
+    const result = await showAlert({
       notificationMessage: `Confirm Friend Request Access`,
       notificationChildMessages: [
         `Do you want to accept the friend request from ${requestAcceptUserName}?`,
@@ -55,42 +54,101 @@ const Request = () => {
       notificationType: "",
       animationType: "alert",
       showActionButtons: true,
+      payload: requestAcceptUserName,
     });
 
-    // const request = await fetch("/api/requests/accept", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({
-    //     requestAcceptUserName,
-    //   }),
-    // });
+    if (result) {
+      const request = await fetch("/api/online/requests/accept", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestAcceptUserName: result,
+        }),
+      });
 
-    // const response = await request.json();
+      const response = await request.json();
 
-    // console.log("response", response);
+      if (response.success === false) {
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: response.error,
+          notificationChildMessages: [],
+          notificationType: "error",
+          animationType: "notification",
+          showActionButtons: false,
+        });
+      } else if (response.success === true) {
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: response.message,
+          notificationChildMessages: [],
+          notificationType: "success",
+          animationType: "notification",
+          showActionButtons: false,
+        });
 
-    // if (response.success === false) {
-    //   setNotificationData({
-    //     id: Date.now(),
-    //     notificationMessage: response.error,
-    //     notificationChildMessages: [],
-    //     notificationType: "error",
-    //     animationType: "notification",
-    //     showActionButtons: false,
-    //   });
-    // } else if (response.success === true) {
-    //   setNotificationData({
-    //     id: Date.now(),
-    //     notificationMessage: response.message,
-    //     notificationChildMessages: [],
-    //     notificationType: "success",
-    //     animationType: "notification",
-    //     showActionButtons: false,
-    //   });
-    // }
+        setRequests((prev) =>
+          prev.filter((user) => user !== requestAcceptUserName),
+        );
+      }
+    } else {
+      console.log("The action is canceled.");
+    }
   }
 
-  async function rejectFriendRequest() {}
+  async function rejectFriendRequest(requestRejectUserName: string) {
+    const result = await showAlert({
+      notificationMessage: `Confirm Friend Request Rejection`,
+      notificationChildMessages: [
+        `Are you sure you want to reject the friend request from ${requestRejectUserName}?`,
+        "If you reject this user more than three times, they will no longer be able to send you friend requests.",
+        "If you choose to report this user, they will immediately lose the ability to send you any further requests.",
+        "Please proceed carefully before making your decision.",
+      ],
+      notificationType: "warning",
+      animationType: "alert",
+      showActionButtons: true,
+      payload: requestRejectUserName,
+    });
+
+    if (result) {
+      const request = await fetch("/api/online/requests/reject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestRejectUserName: result,
+        }),
+      });
+
+      const response = await request.json();
+
+      if (response.success === false) {
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: response.error,
+          notificationChildMessages: [],
+          notificationType: "error",
+          animationType: "notification",
+          showActionButtons: false,
+        });
+      } else if (response.success === true) {
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: response.message,
+          notificationChildMessages: [],
+          notificationType: "success",
+          animationType: "notification",
+          showActionButtons: false,
+        });
+
+        setRequests((prev) =>
+          prev.filter((user) => user !== requestRejectUserName),
+        );
+      }
+    } else {
+      console.log("The action is canceled.");
+    }
+  }
 
   useEffect(() => {
     if (userData) {
@@ -127,7 +185,7 @@ const Request = () => {
                   src="/images/black-accept.png"
                   alt="accept"
                   className="h-[20px] w-[20px] cursor-pointer"
-                  onClick={() => acceptFriendRequest(userName)}
+                  onMouseDown={() => acceptFriendRequest(userName)}
                 />
               </div>
             </div>
