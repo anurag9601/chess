@@ -54,62 +54,101 @@ const Request = () => {
       notificationType: "",
       animationType: "alert",
       showActionButtons: true,
-      payload: "the alert is confirmed.",
+      payload: requestAcceptUserName,
     });
 
     if (result) {
-      console.log("result", result);
+      const request = await fetch("/api/online/requests/accept", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestAcceptUserName: result,
+        }),
+      });
+
+      const response = await request.json();
+
+      if (response.success === false) {
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: response.error,
+          notificationChildMessages: [],
+          notificationType: "error",
+          animationType: "notification",
+          showActionButtons: false,
+        });
+      } else if (response.success === true) {
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: response.message,
+          notificationChildMessages: [],
+          notificationType: "success",
+          animationType: "notification",
+          showActionButtons: false,
+        });
+
+        setRequests((prev) =>
+          prev.filter((user) => user !== requestAcceptUserName),
+        );
+      }
     } else {
-      console.log("The alert is canceled");
+      console.log("The action is canceled.");
     }
-
-    // setNotificationData({
-    //   id: Date.now(),
-    //   notificationMessage: `Confirm Friend Request Access`,
-    //   notificationChildMessages: [
-    //     `Do you want to accept the friend request from ${requestAcceptUserName}?`,
-    //     "Accepting this request will add the user to your friends list",
-    //     "Once added, you can play online and interact with this user",
-    //   ],
-    //   notificationType: "",
-    //   animationType: "alert",
-    //   showActionButtons: true,
-    // });
-
-    // const request = await fetch("/api/requests/accept", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({
-    //     requestAcceptUserName,
-    //   }),
-    // });
-
-    // const response = await request.json();
-
-    // console.log("response", response);
-
-    // if (response.success === false) {
-    //   setNotificationData({
-    //     id: Date.now(),
-    //     notificationMessage: response.error,
-    //     notificationChildMessages: [],
-    //     notificationType: "error",
-    //     animationType: "notification",
-    //     showActionButtons: false,
-    //   });
-    // } else if (response.success === true) {
-    //   setNotificationData({
-    //     id: Date.now(),
-    //     notificationMessage: response.message,
-    //     notificationChildMessages: [],
-    //     notificationType: "success",
-    //     animationType: "notification",
-    //     showActionButtons: false,
-    //   });
-    // }
   }
 
-  async function rejectFriendRequest() {}
+  async function rejectFriendRequest(requestRejectUserName: string) {
+    const result = await showAlert({
+      notificationMessage: `Confirm Friend Request Rejection`,
+      notificationChildMessages: [
+        `Are you sure you want to reject the friend request from ${requestRejectUserName}?`,
+        "If you reject this user more than three times, they will no longer be able to send you friend requests.",
+        "If you choose to report this user, they will immediately lose the ability to send you any further requests.",
+        "Please proceed carefully before making your decision.",
+      ],
+      notificationType: "warning",
+      animationType: "alert",
+      showActionButtons: true,
+      payload: requestRejectUserName,
+    });
+
+    if (result) {
+      const request = await fetch("/api/online/requests/reject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestRejectUserName: result,
+        }),
+      });
+
+      const response = await request.json();
+
+      if (response.success === false) {
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: response.error,
+          notificationChildMessages: [],
+          notificationType: "error",
+          animationType: "notification",
+          showActionButtons: false,
+        });
+      } else if (response.success === true) {
+        setNotificationData({
+          id: Date.now(),
+          notificationMessage: response.message,
+          notificationChildMessages: [],
+          notificationType: "success",
+          animationType: "notification",
+          showActionButtons: false,
+        });
+
+        setRequests((prev) =>
+          prev.filter((user) => user !== requestRejectUserName),
+        );
+      }
+    } else {
+      console.log("The action is canceled.");
+    }
+  }
 
   useEffect(() => {
     if (userData) {
