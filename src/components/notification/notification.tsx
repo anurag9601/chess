@@ -10,7 +10,7 @@ import React, {
 } from "react";
 
 const Notification = () => {
-  const { notificationData, setNotificationData } =
+  const { notificationData, setNotificationData, resolveAlert } =
     useContext(NotificationContext);
 
   const backgroundMapOnNotificationType = {
@@ -28,6 +28,18 @@ const Notification = () => {
   const [closeAlert, setCloseAlert] = useState<boolean>(false);
   const notificationContainerRef = useRef<HTMLDivElement | null>(null);
 
+  function resetNotificationState() {
+    setNotificationData({
+      id: 0,
+      notificationMessage: "",
+      notificationChildMessages: [],
+      notificationType: "",
+      animationType: "notification",
+      showActionButtons: false,
+      payload: undefined,
+    });
+  }
+
   function closeAlertBox() {
     setCloseAlert(true);
 
@@ -35,28 +47,19 @@ const Notification = () => {
       setShowNotification(false);
       setCloseAlert(false);
       clearTimeout(timeout);
-
-      setNotificationData({
-        id: 0,
-        notificationMessage: "",
-        notificationChildMessages: [],
-        notificationType: "",
-        animationType: "notification",
-        showActionButtons: false,
-      });
-    }, 0.5 * 1000);
+      resetNotificationState();
+    }, 500);
 
     if (showNotificationTimeOutRef.current) {
       clearTimeout(showNotificationTimeOutRef.current);
     }
   }
 
-  function handleMouseClickEvent(e: MouseEvent) {
-    console.log("e", e);
+  function handleMouseClickEvent(e: MouseEvent | globalThis.MouseEvent) {
     if (!notificationContainerRef.current) return;
-
     if (notificationContainerRef.current.contains(e.target as Node)) return;
 
+    resolveAlert(null);
     closeAlertBox();
   }
 
@@ -104,7 +107,13 @@ const Notification = () => {
           className={`fixed top-2 left-1/2 max-w-[350px] min-w-[250px]
           rounded-lg py-[10px] px-[15px] border shadow-lg
           ${backgroundMapOnNotificationType[notificationData.notificationType]}
-          flex flex-col gap-[10px] ${notificationData.animationType === "notification" ? "notification-pop-up-animation" : closeAlert === false ? "alert-pop-up-open-animation" : "alert-pop-up-close-animation"}`}
+          flex flex-col gap-[10px] ${
+            notificationData.animationType === "notification"
+              ? "notification-pop-up-animation"
+              : closeAlert === false
+                ? "alert-pop-up-open-animation"
+                : "alert-pop-up-close-animation"
+          }`}
           ref={notificationContainerRef}
         >
           {notificationData.notificationMessage && (
@@ -112,6 +121,7 @@ const Notification = () => {
               {notificationData.notificationMessage}
             </p>
           )}
+
           {notificationData.notificationChildMessages && (
             <ul className="flex flex-col gap-[3px] pl-[10px]">
               {notificationData.notificationChildMessages.map(
@@ -131,11 +141,21 @@ const Notification = () => {
             <div className="flex items-center justify-end gap-[10px]">
               <button
                 className="text-black border-[1px] hover:text-[#f9f6ed] font-[600] rounded-md hover:bg-black duration-300 text-[14px] px-[10px] py-[5px] cursor-pointer"
-                onClick={closeAlertBox}
+                onClick={() => {
+                  resolveAlert(null);
+                  closeAlertBox();
+                }}
               >
                 Cancel
               </button>
-              <button className="bg-black border-[1px] text-[#f9f6ed] font-[600] rounded-md hover:bg-neutral-600 duration-300 text-[14px] px-[10px] py-[5px] cursor-pointer">
+
+              <button
+                className="bg-black border-[1px] text-[#f9f6ed] font-[600] rounded-md hover:bg-neutral-600 duration-300 text-[14px] px-[10px] py-[5px] cursor-pointer"
+                onClick={() => {
+                  resolveAlert(notificationData.payload);
+                  closeAlertBox();
+                }}
+              >
                 Confirm
               </button>
             </div>

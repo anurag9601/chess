@@ -7,7 +7,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 
 const Request = () => {
   const { userData } = useContext(UserContext);
-  const { setNotificationData } = useContext(NotificationContext);
+  const { setNotificationData, showAlert } = useContext(NotificationContext);
   const [requests, setRequests] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const pageSizeRef = useRef<number>(10);
@@ -44,8 +44,7 @@ const Request = () => {
   async function acceptFriendRequest(requestAcceptUserName: string) {
     if (!userData) return;
 
-    setNotificationData({
-      id: Date.now(),
+    const result = await showAlert({
       notificationMessage: `Confirm Friend Request Access`,
       notificationChildMessages: [
         `Do you want to accept the friend request from ${requestAcceptUserName}?`,
@@ -55,7 +54,27 @@ const Request = () => {
       notificationType: "",
       animationType: "alert",
       showActionButtons: true,
+      payload: "the alert is confirmed.",
     });
+
+    if (result) {
+      console.log("result", result);
+    } else {
+      console.log("The alert is canceled");
+    }
+
+    // setNotificationData({
+    //   id: Date.now(),
+    //   notificationMessage: `Confirm Friend Request Access`,
+    //   notificationChildMessages: [
+    //     `Do you want to accept the friend request from ${requestAcceptUserName}?`,
+    //     "Accepting this request will add the user to your friends list",
+    //     "Once added, you can play online and interact with this user",
+    //   ],
+    //   notificationType: "",
+    //   animationType: "alert",
+    //   showActionButtons: true,
+    // });
 
     // const request = await fetch("/api/requests/accept", {
     //   method: "POST",
