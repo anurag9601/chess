@@ -45,11 +45,11 @@ export async function POST(req: NextRequest) {
         }).populate({
             path: "sendBy",
             select: "uniqueUserName -_id"
-        }).select("sendBy -_id");
+        }).select("sendBy -_id").limit(body.pageSize);
 
         const requestList = userActiveRequests.map((req) => req.sendBy.uniqueUserName);
 
-        return NextResponse.json({ success: true, requestList: requestList.slice(0, body.pageSize) }, { status: 200 });
+        return NextResponse.json({ success: true, requestList: requestList }, { status: 200 });
 
     } catch (error) {
         console.log("Something went wrong in /api/online/requests/ route", error);

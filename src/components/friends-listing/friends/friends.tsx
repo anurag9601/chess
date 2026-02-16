@@ -53,19 +53,21 @@ const Friends = () => {
         <ListLoading />
       ) : friends.length > 0 ? (
         <div className="flex-1 flex flex-col items-start justify-start gap-[10px] h-full w-full overflow-y-auto custom-scrollbar">
-          <div className="flex items-start justify-between gap-[10px] w-full bg-[#f9f6ed] p-[10px] rounded-md hover: ">
-            <div className="flex items-center justify-center gap-[10px]">
-              <img
-                src="./images/user-pawn.png"
-                alt="user-pawn"
-                className="h-[20px] w-[20px]"
-              />
-              <p className="text-[14px] font-[700] break-all">Anurag 01</p>
+          {friends.map((friend) => (
+            <div className="flex items-start justify-between gap-[10px] w-full bg-[#f9f6ed] p-[10px] rounded-md hover: " key={friend}>
+              <div className="flex items-center justify-center gap-[10px]">
+                <img
+                  src="./images/user-pawn.png"
+                  alt="user-pawn"
+                  className="h-[20px] w-[20px]"
+                />
+                <p className="text-[14px] font-[700] break-all">{friend}</p>
+              </div>
+              <button className="bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[13px] px-[10px] py-[5px] rounded-lg cursor-pointer">
+                Challenge
+              </button>
             </div>
-            <button className="bg-gradient-to-r from-[#000000] to-[#3b3b3b] text-[#f4f4f4] font-[600] text-[13px] px-[10px] py-[5px] rounded-lg cursor-pointer">
-              Challenge
-            </button>
-          </div>
+          ))}
         </div>
       ) : (
         <div className="flex-1 flex items-center justify-center">

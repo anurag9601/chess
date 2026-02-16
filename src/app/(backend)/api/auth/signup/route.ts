@@ -1,5 +1,6 @@
 import { connectMongoDB } from "@/mongodb/connectDB";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
+import UserFriendModel from "@/mongodb/models/UserFriend.model";
 import { NextRequest, NextResponse } from "next/server";
 
 interface reqBodyI {
@@ -26,11 +27,15 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, error: "User name or Email is already registered." }, { status: 400 });
         };
 
-        await UserAuthModel.create({
+        const currentUser = await UserAuthModel.create({
             fName: body.fName,
             lName: body.lName,
             userEmail: body.userEmail.replace(/\s+/g, ""),
             uniqueUserName: body.uniqueUserName.replace(/\s+/g, ""),
+        });
+
+        await UserFriendModel.create({
+            userId: currentUser._id
         });
 
         return NextResponse.json({ success: true, message: "🎉 Congratulations! Your registration has been successfully completed." }, { status: 200 });

@@ -3,7 +3,6 @@ import { connectMongoDB } from "@/mongodb/connectDB";
 import EmailVerificationModel from "@/mongodb/models/EmailVerification.model";
 import SignInVerificationSessionModel from "@/mongodb/models/SignInVerification.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
-import UserFriendModel from "@/mongodb/models/UserFriend.model";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -48,12 +47,6 @@ export async function POST(req: NextRequest) {
             _id: availableSignInSession.userId
         });
 
-        if (currentUser) {
-            await UserFriendModel.create({
-                userId: currentUser._id
-            });
-        }
-
         if (currentUser.isEmailVerified === false) {
             const uuid = uuidv4();
 
@@ -91,7 +84,6 @@ export async function POST(req: NextRequest) {
         response.cookies.set("auth-token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
             maxAge: 90 * 24 * 60 * 60,
         });
 

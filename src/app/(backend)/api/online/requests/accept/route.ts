@@ -3,6 +3,7 @@ import FriendRequestModel from "@/mongodb/models/FriendRequest.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
 import { authorizeUserAuth } from "@/functions/backend/authFunction";
 import { generateJWTDataType } from "@/lib/jsonWebtoken";
+import UserFriendModel from "@/mongodb/models/UserFriend.model";
 
 interface reqBodyI {
     requestAcceptUserName: string;
@@ -42,6 +43,9 @@ export async function POST(req: NextRequest) {
         const friendRequest = await FriendRequestModel.findOne({
             sendBy: requestSendUser._id,
             receivedBy: currentUserData._id,
+            status: "pending",
+            isActive: true,
+            isDeleted: false,
         });
 
         if (!friendRequest) {
@@ -52,6 +56,25 @@ export async function POST(req: NextRequest) {
         friendRequest.isActive = false;
         friendRequest.isDeleted = true;
         await friendRequest.save();
+
+        const currentUserActiveFriendRequestForRequestSendUser = await FriendRequestModel.findOne({ sendBy: currentUserData._id, receivedBy: requestSendUser._id, status: "pending", isActive: true, isDeleted: false });
+
+        if (currentUserActiveFriendRequestForRequestSendUser) {
+            currentUserActiveFriendRequestForRequestSendUser.status = "accepted";
+            currentUserActiveFriendRequestForRequestSendUser.isActive = false;
+            currentUserActiveFriendRequestForRequestSendUser.isDeleted = true;
+            await currentUserActiveFriendRequestForRequestSendUser.save();
+        }
+
+        const userFriendList = await UserFriendModel.findOne({ userId : currentUserData._id });
+
+        userFriendList.friends.push(requestSendUser._id);
+        await userFriendList.save();
+
+        const requestsendUserFriendList = await UserFriendModel.findOne({ userId : requestSendUser._id });
+
+        requestsendUserFriendList.friends.push(currentUserData._id);
+        await requestsendUserFriendList.save();
 
         return NextResponse.json({ success: true, message: `🎉 Congratulations! You are now friends with ${body.requestAcceptUserName}.` }, { status: 200 });
 

@@ -104,7 +104,7 @@ const Notification = () => {
     <>
       {showNotification && (
         <div
-          className={`fixed top-2 left-1/2 max-w-[350px] min-w-[250px]
+          className={`fixed top-2 left-1/2 max-w-[350px]
           rounded-lg py-[10px] px-[15px] border shadow-lg
           ${backgroundMapOnNotificationType[notificationData.notificationType]}
           flex flex-col gap-[10px] ${
@@ -122,7 +122,7 @@ const Notification = () => {
             </p>
           )}
 
-          {notificationData.notificationChildMessages && (
+          {notificationData.notificationChildMessages.length > 0 && (
             <ul className="flex flex-col gap-[3px] pl-[10px]">
               {notificationData.notificationChildMessages.map(
                 (message, index) => (

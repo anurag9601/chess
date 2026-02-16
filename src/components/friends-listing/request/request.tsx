@@ -23,8 +23,6 @@ const Request = () => {
 
     const response = await request.json();
 
-    console.log("response", response);
-
     if (!response.success) {
       setNotificationData({
         id: Date.now(),
