@@ -63,8 +63,6 @@ export async function POST(req: NextRequest) {
 
         activeOtps = activeOtps.map((o) => o.otp);
 
-        console.log("activeOtps", activeOtps);
-
         let newOtp: string | null = null;
 
         while (!newOtp || activeOtps.includes(newOtp || "")) {

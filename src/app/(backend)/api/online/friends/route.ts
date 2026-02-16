@@ -41,13 +41,18 @@ export async function POST(req: NextRequest) {
             userId: currentUserData._id,
             isActive: true,
             isDeleted: false,
-        });
+        }).populate({
+            path: "friends",
+            select: "uniqueUserName -_id"
+        }).limit(body.pageSize);
 
         if (!userFriendData) {
             return NextResponse.json({ success: false, error: "User not found " }, { status: 400 });
         };
 
-        return NextResponse.json({ success: true, users: userFriendData.friends.slice(0, body.pageSize) });
+        const users = userFriendData.friends.map((friend: { uniqueUserName: string }) => friend.uniqueUserName);
+
+        return NextResponse.json({ success: true, users: users });
 
     } catch (error) {
         console.log("Something went wrong in /api/online/friends/ route", error);

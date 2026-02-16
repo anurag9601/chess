@@ -68,8 +68,6 @@ export async function POST(req: NextRequest) {
 
         const userFriendList = await UserFriendModel.findOne({ userId : currentUserData._id });
 
-        console.log("userFriendList", userFriendList);
-
         userFriendList.friends.push(requestSendUser._id);
         await userFriendList.save();
 
