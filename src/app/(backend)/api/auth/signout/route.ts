@@ -10,7 +10,6 @@ export function GET() {
         response.cookies.set("auth-token", "", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
             maxAge: 0,
         });
 
