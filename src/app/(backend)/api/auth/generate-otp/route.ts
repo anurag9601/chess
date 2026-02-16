@@ -53,13 +53,15 @@ export async function POST(req: NextRequest) {
 
             currentUserActiveSession.isActive = false;
             currentUserActiveSession.isDeleted = true;
-            currentUserActiveSession.save();
+            await currentUserActiveSession.save();
         }
 
-        const activeOtps = await SignInVerificationSessionModel.find({
+        let activeOtps = await SignInVerificationSessionModel.find({
             isActive: true,
             isDeleted: false,
-        }).select("otp").lean<string[]>();
+        }).select("otp -_id");
+
+        activeOtps = activeOtps.map((o) => o.otp);
 
         console.log("activeOtps", activeOtps);
 
