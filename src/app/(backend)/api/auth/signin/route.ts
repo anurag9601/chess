@@ -3,7 +3,6 @@ import { connectMongoDB } from "@/mongodb/connectDB";
 import EmailVerificationModel from "@/mongodb/models/EmailVerification.model";
 import SignInVerificationSessionModel from "@/mongodb/models/SignInVerification.model";
 import UserAuthModel from "@/mongodb/models/UserAuth.model";
-import UserFriendModel from "@/mongodb/models/UserFriend.model";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -47,12 +46,6 @@ export async function POST(req: NextRequest) {
         const currentUser = await UserAuthModel.findOne({
             _id: availableSignInSession.userId
         });
-
-        if (currentUser) {
-            await UserFriendModel.create({
-                userId: currentUser._id
-            });
-        }
 
         if (currentUser.isEmailVerified === false) {
             const uuid = uuidv4();
