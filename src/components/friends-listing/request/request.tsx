@@ -103,7 +103,7 @@ const Request = () => {
         "If you choose to report this user, they will immediately lose the ability to send you any further requests.",
         "Please proceed carefully before making your decision.",
       ],
-      notificationType: "warning",
+      notificationType: "",
       animationType: "alert",
       showActionButtons: true,
       payload: requestRejectUserName,
@@ -178,6 +178,7 @@ const Request = () => {
                   src="/images/black-reject.png"
                   alt="reject"
                   className="h-[20px] w-[20px] cursor-pointer"
+                  onMouseDown={() => rejectFriendRequest(userName)}
                 />
                 <img
                   src="/images/black-accept.png"
