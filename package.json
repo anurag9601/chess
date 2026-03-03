@@ -11,7 +11,8 @@
     "https": "next dev --turbopack --experimental-https"
   },
   "dependencies": {
-    "ioredis": "^5.8.2",
+    "bullmq": "^5.70.1",
+    "ioredis": "^5.10.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
     "next": "15.5.4",
